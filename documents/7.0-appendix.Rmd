@@ -1,0 +1,13 @@
+# Appendix
+
+## Appendix A: Hardware / Software Environment
+The project was implemented on a Windows x64-based laptop powered by an Intel Core i7-3610QM CPU @ 2.30GHz, 2301 Mhz processor with 4 Cores, 8 Logical Processors, and 16.0 GB of installed memory, running the Microsoft Windows 10 Home operating system, version	10.0.14393 Build 14393. The scripts were authored using the 64 bit version of the R Programming Language, version 3.3.1. [@TheRFoundation2015] within R. Studio Version 0.99.903 [@RStudioTeam2016] development environment. 
+
+Several **Natural Language Processing (NLP)** software packages provided essential functionality throughout the analysis, modeling, experimentation, and evaluation phases of the project. The quanteda package, version 0.9.9-20 [@Benoit2016b], provided tokenization, feature selection and analysis functionality. Part-of-speech (POS) tagging was provided by the openNLP package package, version 0.2-6 [@Kottmann2016]. Spell checking was performed using the qdap package version 2.2.5 [@TylerWRinker2016]. Finally, the lsa package version 0.73.1 provided the latent semantic analysis capability [Wild2015].
+
+The complete list of R packages used follows:
+
+```{r rPackages-A, echo = T, message = F, eval = T, warning = F}
+sessionInfo()
+```
+`r figr("rPackages-A", prefix=TRUE, link=TRUE, type="Appendix A")`: R Packages 

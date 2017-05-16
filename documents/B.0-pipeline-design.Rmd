@@ -1,0 +1,28 @@
+
+```{r createVGC, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}
+vgc <- parallelizeTask(createVGC, clean, registers, directories)  
+```
+
+```{r createZipf, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}
+zipf <- parallelizeTask(createZipf, clean, registers, vgc, directories)
+```
+
+```{r estimateSampleSize, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1, -2), results='hide'}
+estimates <- parallelizeTask(estimateSampleSize, clean, registers ,directories)    
+```
+
+```{r samplingUnit, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-5), results='hide'}
+samplingUnit <- parallelizeTask(estimateSamplingUnit, clean, registers, posTags, directories)
+```
+
+```{r corpusSize, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-6), results='hide'}
+corpusSize <- parallelizeTask(estimateCorpusSize, clean, registers, posTags, directories)     
+```
+
+```{r registerSize, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}
+registerSize <- parallelizeTask(estimateRegisterSize, clean, registers, corpusSize, samplingUnit, posTags, directories)
+```
+
+```{r designPilot, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1,-4), results='hide'}
+pilotDesign <- parallelizeTask(designPilot, estimates$sampleSize, registerSize, samplingUnit, cleanDataAnalysis) 
+```

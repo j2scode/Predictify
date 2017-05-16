@@ -1,0 +1,74 @@
+---
+title: "PredictifyR | Integrated Word Prediction Model - Milestone Report 1"
+author: "John James"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+output:
+  html_document:
+    highlight: pygments
+    number_sections: yes
+    theme: flatly
+    toc: yes
+    toc_depth: 2
+  pdf_document: default
+bibliography: NLP.bib
+---
+
+
+```{r load, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
+# Load R Markdown libraries
+library(knitr)
+library(kfigr)
+```
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+# Set options
+knitr::opts_chunk$set(root.dir = "..", warning=F, options(keep.comment = FALSE), comment = NA)
+knitr::opts_chunk$set(fig.path = "../reports/figures", fig.height = 4, fig.width = 10, options(scipen=4))
+knitr::opts_chunk$set(autodep = TRUE)
+knitr::opts_knit$set(kfigr.prefix = T, kfigr.link = T, root.dir = "..")
+knitr::knit_hooks$set(inline = function(x) { if(!is.numeric(x)){ x }else{ prettyNum(x, big.mark=",") } })
+``` 
+
+```{r initEnvironment, echo=F, eval=T, message=F, warning=F, cache=F, results='hide'}
+source('./config/initEnvironment.R')
+```
+
+```{r cacheSetup, echo=F, eval=T, message=F, warning=F, cache=F, results='hide'}
+opts_chunk$set(cache.extra = docSource)
+
+```
+
+```{r child = 'A.0-pipeline-analysis.Rmd'}  
+```
+
+# Overview
+As a consequence of cheaper, smarter, and faster mobile software and devices, increasing numbers of people and businesses are spending more time networking, shopping, learning, banking and entertaining via tablets and smart-phones. Mobile OS platforms and companies like  Swiftkey have evolved word prediction features which have been shown to reduce keystrokes and spelling errors while improving the speed and accuracy with which users are able to text.  This project aims to implement a light-weight, corpus-based, word prediction capability that could theoretically run on a mobile phone or tablet. Whereas many word prediction systems are probabilistic models based upon word frequencies, PredictifyR integrates an n-gram based probabilistic language model with syntactical (part-of-speech) and semantic information to improve predictive accuracy. 
+
+```{r schedule-M, echo=F, eval=T, message=F, warning=F, cache=F, results='asis'}
+gantt <- plotGantt()
+gantt
+```
+`r figr("ganttChart-M", TRUE, type="Figure")`: PredictifyR Project Schedule
+
+```{r child = '3.0-methods-analysis.Rmd'}  
+```
+
+
+# Next Steps
+Having concluded the analysis phase, the modeling phase will include corpus transformation, predictive modeling, tuning and model integration.  Specifically, the following tasks will be undertaken:
+
+1. Preprocess the training, validation, and test corpora for out-of-vocabulary (OOV) words.  All hapax legomena will be replaced with the 'UNK', the unknown pseudoword.
+2. Process the corpora to include sentence boundary annotations.
+3. Complete the Modified Kesner-Ney Probabilistic 4-Gram Model
+4. Complete and integrate the Syntactic Language Model
+5. Complete and integrate the Semantic Language Model
+6. Tune model interpolation factors
+7. Conduct model evaluation experiments
+
+Lastly, the development phase will include the design, implementation, and roll-out of the prediction system and the production of the project final slide deck.
+
+
+# References
+
+<div id="refs"></div>
+

@@ -1,0 +1,111 @@
+# Introduction
+Word prediction language models are essential components within a range of natural language processing (NLP) applications such as Augmented and Alternative Communication (AAC), statistical machine translation, speech recognition [@Bahl1983], handwriting recognition, word-sense disambiguation, spelling correction and predictive text entry. Mobile device applications, which are the focus of this report, require language models that are accurate, fast, and compact. The statistical n-gram language model is the dominant technology; yet, more sophisticated models are being developed which are able to exploit other natural language phenomena, including syntactic, semantic, and morphological structures [@Cavalieri2015]. Innovative interpolation methods to integrate language models are also being developed with interesting results. 
+
+Through a systematic evaluation of selected word prediction strategies, algorithms and language models, this work seeks to determine which algorithms best meet the performance imperatives of the mobile device predictive text entry application. Statistical n-Gram techniques, syntactic modeling approaches, semantic-based models, and classification-based techniques were evaluated from prediction accuracy, model size, and speed perspectives. 
+
+The remainder of this section provides an introduction to probabilistic word prediction and n-Gram language models. Section 2 surveys related work in terms of the best performing n-Gram based-models and smoothing techniques, models which integrate syntactic information, semantic approaches and learning-classification based approaches. Section 3 reveals the details of the experimental methodology including corpus analysis, preprocessing, and sampling, as well as language model implementation and parameter selection.  Section 4 outlines the results of the study and finally, section 5 summarizes the most important conclusions of the work.
+
+## Probabilistic Word Prediction
+The problem of predicting the next word, given a sentence or some history, begs the question, "what is the most probable word?", given the history. Language models assign probabilities to words and sequences of words, based upon observed frequencies in corpus of text. Theoretically, one might estimate the probability that word, ${w_n}$, is the next word in a sequence of words (${w_1}$,${w_2}$, ..., $w_{n-1}$) (or the probability of the sequence (${w_1}$,${w_2}$, ..., $w_{n}$) by counting the number of times the sequence occurs and normalizing that by the number of times the history occurs as follows:
+
+$$P({w_1},{w_2}, ..., w_{n}) = \frac{C({w_1},{w_2}, ..., w_{n})}{C({w_1},{w_2}, ..., w_{n-1})}$$
+Even with a corpus as large as the internet, new language and sequences are created all the time and it may not be possible to estimate such long sequences. Using the chain rule of probabilities, we can decompose the problem into a list of conditional probabilities as follows [@Jurafsky2016]:
+$$P({w_1^n}) = P({w_1})P({w_2}|{w_1})P({w_3}|{w_1^2})...P({w_n}|{w_1^{n-1}})$$
+Still one is left with estimating the probability of long sequences. 
+
+### N-Grams
+Russian mathematician Andrey Markov observed that the language production is a "memoryless" stochastical process where the conditional probability distribution of A future word depends only upon the present word [@Markov1906]. Thus one can estimate the probability of word given its entire history by calculating the probability of the word given the prior word.  Thus:
+$$P({w_n}|{w_1^{n-1}}) \approx P({w_n}|{w_{n-1}})$$
+The language model that estimates the probability using only the previous word is called the bigram model.  This can be generalized to the trigram model that takes into account, the previous two words and the N-gram model that considers the previous N-1 words. Thus the general equation for the N-gram approximation of the conditional probability of the next word in a sentence is [@Jurafsky2016]:
+$$P({w_n}|{w_1^{n-1}}) \approx P({w_n}|{w_{n-N+1}^{n-1}})$$
+To calculate these N-gram probabilities, one performs a **maximum likelihood estimation** or **MLE** as follows:
+$$P({w_n}|{w_{n-N+1}^{n-1}}) = \frac{C({w_{n-N+1}^{n-1}},{w_n})}{C({w_{n-N+1}^{n-1}})}$$
+Equation `r figr("mleEstimation-I", F, type="Equation")` uses the relative frequency of a particular sequence and its prefix to estimate N-gram probabilities.
+
+### Evaluating Language Models
+Assuming a researcher has the resources and time, the true measure of the performance of a language model is obtained by conducting an end-to-end **extrinsic evaluation** of the model within an application [@Jurafsky2016]. **Intrinsic evaluations**, on the other hand, provide performance metrics independent of any application. Given a training set, upon which the language model is trained, a researcher can measure the performance on an unseen test set by evaluating the degree to which the model models the test set. This can be performed by calculating the probability of the test set, but this metric is rarely used in practice. **Perplexity**,  the inverse probability of the test set, normalized by the number of words, is the metric commonly used in intrinsic evaluations and is defined as follows:
+$$PP(W) = \sqrt[@N]{\frac{1}{P(w_1 w_2 ... w_N)}} = \sqrt[@N]{\displaystyle\prod_{i=1}^{N}\frac{1}{P(w_i | w_1...w_{i-1})}}$$
+where a test set $W = w_1 w_2 ... w_N$ [@Jurafsky2016]. 
+
+Multiplying all the probabilities of all the N-gram together can result in numeric underflow. Instead one works in log space, adding the log of the probabilities together, then taking the average of the sum of the log probabilities over the entire corpus.  Lastly, we take the negative of the corpus log probability and raise that to the power of 2, resulting in a positive number.  The final equation is as follows:
+$$Perplexity = 2^{-{1/N}{\displaystyle\sum_{i=1}^N{log p({s_i})}}}$$
+
+Note that perplexity calculation fails with zeros in the denominator if a word or N-gram sequence from the test set doesn't occur in the training set. The next section provides techniques for dealing with such out-of-vocabulary (OOV) words and sequences. 
+
+### Out-of-Vocabulary (OOV) Words
+Intrinsic evaluations require language models to deal with unseen words in the perplexity calculation. There are essentially two techniques for training probabilities of unseen words. The first is to choose a fixed vocabulary in advance, convert in the training set, any word that is not in the vocabulary set, to an unknown word token <UNK>, then estimate the probabilities for <UNK> from counts in the training set. The other method, should a fixed vocabulary not be available, is to convert the first occurrence of each word type in the training set to <UNK>, then train the model as normal [@Jurafsky2016].
+
+### Smoothing
+Smoothing refers to a class of techniques to deal with unseen events by adjusting the maximum likelihood estimates of low probabilities upward and high probabilities downward. This not only prevents zero probabilities, but improves the predictive accuracy of the language model overall. One of the simplest smoothing techniques is Add-k smoothing [@Jeffreys61], in which the count of each n-gram is increased by $\delta$, typically $0 < \delta \leq 1$. Good-Turing smoothing estimates the probability of unseen events by reallocating the probability mass of n-grams that occur $r + 1$ times in the training data to the n-grams that occur $r$ times [@Good1953]. Since the algorithm doesn't include the combination of higher-order models with lower-order models, it is typically used with other smoothing techniques [@Chen1998]. Jelinek-Mercer smoothing interpolates higher-order maximum likely estimate probabilities with lower-order probabilities, where the interpolation factor $\lambda_{w_{i-n+1}^{i-1}}$ is estimated for each history using held-out data [@JelMer80].  Katz smoothing extends the Good-Turing estimate by adding the combination of higher-order models with lower-order models [@Katz1987]. Witten-Bell smoothing [@Bell:1990:TC:77753] extends Jelinek-Mercer smoothing in that the nth-order smoothed model is defined recursively as a linear interpolation between the nth-order maximum likelihood model and the ($n-1$)th-order smoothed model. The interpolation parameter $\lambda_{w_{i-n+1}^{i-1}}$, is computed by counting the number of unique words that follow the history $w_{i-n+1}^{i-1}$. Absolute Discounting [@Ney1994a], ), like Jelinek-Mercer smoothing, combines higher and lower-order models; however, instead of multiplying the higher-order maximum-likelihood distribution by a factor $\lambda_{w_{i-n+1}^{i-1}}$, a discount factor $D\leq1$ is subtracted from each non-zero count. Kneser-Ney smoothing [@Kneser1995] is an extension of absolute discounting where the lower-order distribution is proportional not with the count of the n-gram, but the number of unique words that follow the n-gram in the training text. Modified Kneser-Ney enhances the discounting regime by using multiple discounts $d_1$, $d-2$, $d_{3+}$ for N-grams with counts of 1, 2 and 3 or more, respectively. 
+
+#### Absolute Discounting
+Absolute discounting [@Ney1994] subtracts a fixed discount $d$ typically less than 1, from each count. Very high counts have good probability estimates and are not affected by the discount as much as smaller counts with relatively unreliable estimates. Interpolated absolute discounting improves the algorithm by interpolating lower order models as follows:
+
+$$P_{abs}(w_i | w_{i-n+1}^{i-1}) = \frac{max\left\{c(w_{i-n+1}^{i})-D,0\right\}} {c(w_{i-n+1}^{i-1})}+\lambda(w_{i-n+1}^{i-1})P_{abs}(w_i | w_{i-n+2}^{i-1})$$
+To force the distribution to sum to 1:
+$$\lambda(w_{i-n+1}^{i-1}) = \frac{D}{{c(w_{i-n+1}^{i-1})}} N_{1+}(w_{i-n+1}^{i-1}\bullet)$$
+where $N_{1+}$ is the number of words that have one or more counts and
+$N_{1+}(w_{i-n+1}^{i-1}\bullet) = |\left\{w_i : c(w_{i-n+1}^{i} w_i) > 0\right\}|$
+is the number of unique words that follow the sequence. $D$ is estimated as follows:
+$$D = \frac{n_1}{n_1 + 2n_2}$$
+where $n_1$ and $n_2$ are the total number of n-grams with exactly one and two counts, respectively [@Chen1998].
+
+#### Kneser-Ney Smoothing
+Kneser-Ney smoothing improves on interpolated absolute discounting by constructing the lower-order distribution that is combined with the higher-order distribution in a novel manner.  In interpolated absolute discounting, the lower-order distribution is based upon a smoothed version of the lower-order maximum likelihood estimation.  Rather than considering lower-order n-gram frequencies, the Kneser-Ney algorithm bases the lower-order distribution on the number of n-gram prefixes the word follows. In other words, the algorithm counts how often the word exists as a novel continuation of the n-gram prefix [@Chen1998]. There are three Kneser-Ney formulations: one for the **highest** order N-gram distributions $n$ where $n=N$, a second for **higher** distributions $n$ where $1 < n < N$, and a third for the unigram distribution $n = 1$. The recursive formulation for the **highest** order distribution is as follows:
+
+$$P_{KN}(w_i | w_{i-n+1}^{i-1}) = \frac{max\left\{c(w_{i-n+1}^{i})-D,0\right\}}{ c(w_{i-n+1}^{i-1})}+\frac{D}{c(w_{i-n+1}^{i-1})} N_{1+}(w_{i-n+1}^{i-1}\bullet)P_{KN}(w_i | w_{i-n+2}^{i-1})$$
+where
+$\begin{equation}N_{1+}(w_{i-n+1}^{i-1}\bullet) = |\left\{w_i : c(w_{i-n+1}^{i} w_i) > 0\right\}|\end{equation}$
+
+The recursive formulation for the **higher** order distribution $n$ where $1 < n < N$ is as follows:
+$$\begin{equation}
+P_{KN}(w_i | w_{i-n+1}^{i-1}) = \frac{max\left\{N_{1+}(\bullet w_{i-n+1}^{i})-D,0\right\}}{N_{1+}(\bullet w_{i-n+1}^{i-1}\bullet)}+\frac{D}{N_{1+}(\bullet w_{i-n+1}^{i-1}\bullet)} N_{1+}(w_{i-n+1}^{i-1}\bullet)P_{KN}(w_i | w_{i-n+2}^{i-1})
+\end{equation}
+$$
+where
+$\begin{equation}N_{1+}(w_{i-n+1}^{i}\bullet) = |\left\{w_{i-n} : c(w_{i-n}^{i} w_i) > 0\right\}|\end{equation}$
+$\begin{equation}N_{1+}(\bullet w_{i-n+1}^{i-1}\bullet) = |\left\{(w_{i-n}, w_i) : c(w_{i-n}^{i}) > 0\right\}| = \displaystyle\sum_{w_i} N_{1+}(\bullet w_{i-n+1}^{i})\end{equation}$
+
+The formulation for the **lowest** unigram distribution is as follows:
+$$\begin{equation}
+P_{KN}(w_i) = \frac{N_{1+}(\bullet w_{i})}{N_{1+}(\bullet\bullet)}
+\end{equation}
+$$
+where
+$N_{1+}(\bullet w_i) = |\left\{w_{i-1} : c(w_{i-1}^{i}) > 0\right\}|$
+$N_{1+}(\bullet \bullet) = |\left\{(w_{i-1}, w_i) : c(w_{i-1}^{i}) > 0\right\}| = \displaystyle\sum_{w_i} N_{1+}(\bullet w_{i})$
+
+#### Modified Kneser-Ney Smoothing
+Modified Kneser-Ney Smoothing is the best performing version of the group. Instead of using a single discount $D$ for all non-zero counts, this version uses three different discount parameters $D_{n,1}$,$D_{n,2}$, and $D_{n,3+}$ for each N-Gram order ($1 < n \leq N$). The equation for the **higher** order N-Grams is as follows:
+$$\begin{equation}
+P_{MKN}(w_i | w_{i-n+1}^{i-1}) = \frac{max\left\{N_{1+}(\bullet w_{i-n+1}^{i})-D_n(c(w_{i-n+1}^i)),0\right\}}{N_{1+}(\bullet w_{i-n+1}^{i-1}\bullet)}+\lambda_{low}(w_{i-n+1}^{i-1})P_{MKN}(w_i | w_{i-n+2}^{i-1})
+\end{equation}
+$$
+
+where
+$$D_n(c) =
+  \begin{cases}
+    0    & \quad \text{if } c=0\\
+    D_{n,1}  & \quad \text{if } c=1\\
+    D_{n,2}  & \quad \text{if } c=2\\
+    D_{n,3+}  & \quad \text{if } c\geq3\\
+  \end{cases}
+$$
+The normalized discount $\lambda_{low}(w_{i-n+1}^{i-1})$ for the **higher** order N-Gram distributions is:
+$$\lambda_{low}(w_{i-n+1}^{i-1}) = \frac{D_{n,1} N_1(w_{i-n+1}^{i-1}\bullet) + D_{n,2} N_2(w_{i-n+1}^{i-1}\bullet) + D_{n,3+} N_{3+}(w_{i-n+1}^{i-1}\bullet)}{N_{1+}(\bullet w_{i-n+1}^{i-1}\bullet)}$$
+where
+$N_1(w_{i-n+1}^{i-1}\bullet)$, $N_2(w_{i-n+1}^{i-1}\bullet)$, and $N_{3+}(w_{i-n+1}^{i-1}\bullet)$ are the unique one word contexts in which the sequence appears, precisely once, twice, or 3 or more times, respectively.
+
+Analogously, the equation for the **highest** order N-Gram distribution uses absolute counts for the highest level discounted probability estimate and is as follows:
+$$\begin{equation}
+P_{MKN}(w_i | w_{i-n+1}^{i-1}) = \frac{max\left\{c(w_{i-n+1}^i)-D_n(c(w_{i-n+1}^i)),0\right\}}{c(w_{i-n+1}^{i-1})}+\lambda_{high}(w_{i-n+1}^{i-1})P_{MKN}(w_i | w_{i-n+2}^{i-1})
+\end{equation}$$
+
+where the normalized discount $\lambda_{high}(w_{i-n+1}^{i-1})$ for the **highest** order N-Gram distributions is:
+$$\lambda_{high}(w_{i-n+1}^{i-1}) = \frac{D_{n,1} N_1(w_{i-n+1}^{i-1}\bullet) + D_{n,2} N_2(w_{i-n+1}^{i-1}\bullet) + D_{n,3+} N_{3+}(w_{i-n+1}^{i-1}\bullet)}{c(w_{i-n+1}^{i-1})}$$
+
+## Syntactic Word Prediction
+Syntactic word prediction aims to predict the most likely next word, or word in sequence, based upon its syntactical relationship with its context. Part-of-speech (POS) tags of all words are identified in a corpus and the system combines this syntactic knowledge with the syntactical structure of the language to make predictions [@Fazly2002]. The statistical syntax approach assigns probabilities to candidate words by estimating the probability of having that word, with its POS tag, in its current position. Some approaches consider the current word and its POS tag, as well as the POS tag of the preceding word(s). Using linear interpolation techniques, a system can predict the next POS, based upon previous POS(s), then the most likely word given the predicted POS, then combine that with the probability of the word, given its previous word(s). Experiments with such "integrated" models have shown them to lower perplexity and increase key stroke savings over traditional word-based N-gram models [@Fazly2002].
+
+## Semantic Word Prediction
+Semantic knowledge is combined with n-gram probabilities to predict semantically more appropriate words than those predicted by n-gram models alone. In word prediction applications, the semantic association of the predicted word(s) with the preceding context is measured and the word candidates with the strongest semantic association are chosen for the prediction list. Latent Semantic Analysis (LSA) [@Landauer1997], the most prominent approach, uses high-dimensional spatial representations to address the problem of word prediction by capturing simlarity in word usage [@Griffiths2003]. The input to LSA is a document frequency matrix.  The matrix is transformed using singular value decomposition (SVD) to a lower dimensional subspace capturing much of the variation in usage among the words. The output is a vector for each word, locating it within the derived subspace [@Griffiths2003].  The semantic association between words is the measure of the cosine of the angle between the two vectors. Of the words predicted by the n-gram model, those having the strongest association with the previous word are given a higher probability. 

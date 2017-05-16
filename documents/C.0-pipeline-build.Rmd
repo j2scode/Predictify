@@ -1,0 +1,16 @@
+
+```{r build, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
+parallelizeTask(buildPilot, clean, pilot, pilotDesign$pilot, registers) 
+```
+
+```{r tagTrainingCorpus, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
+parallelizeTask(tagPilot, pilot, registers) 
+```
+
+```{r verifyVocabulary, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-4), results='hide'}     
+coverage <- parallelizeTask(verifyPilotVocabulary, clean, cleanDataAnalysis, pilot, registers, directories)  
+```
+
+```{r verifyFeatures, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-4), results='hide'}     
+features <- parallelizeTask(verifyPilotLinguistics, clean, pilot, registers, posTags, directories)
+```

@@ -1,0 +1,5 @@
+```{r rq01, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-20), results='hide'}     
+#evaluations <- rq01Pipeline(design, analysis, korpora, 
+#                            featureDistributionAnalysis[[length(featureDistributionAnalysis)]]$size, 
+#                            regexPatterns, directories, lm$mkn)
+```

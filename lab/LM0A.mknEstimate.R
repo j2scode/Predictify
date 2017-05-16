@@ -1,0 +1,74 @@
+## ---- mkn_Estimate
+
+#==============================================================================#
+#                                   mknEstimate                                # 
+#==============================================================================#
+#'  mknEstimate
+#' 
+#' This function calculates the modified Kneser-Ney estimates for the 
+#' n = 4-gram model
+#' 
+#' @param mkn - the model meta data 
+#' @author John James
+#' @export
+mknEstimate <- function(mkn) {
+  
+  startTime <- Sys.time()
+  
+  message(paste('\nEstimating probabilities at ', startTime))
+  
+  estimate <- function(x) {
+    message(paste('...estimating', mkn$args$counts[[x]]$fileDesc))
+    
+    # Load nGrams
+    lower <- loadObject(mkn$args$counts[[x-1]])
+    current <- loadObject(mkn$args$counts[[x]])
+
+    # Obtain probability for the suffix 
+    pSuffix <- lower[,.(nGram, Pmkn)]
+    setnames(pSuffix, 'Pmkn', 'PmknSuffix')
+    
+    # Merge probability of the suffix into a temporary data table
+    temp <- current[,.(nGram, suffix, alpha, lambda)]
+    temp <- merge(temp, pSuffix, by.x = 'suffix', by.y = 'nGram', all.x = TRUE)
+    
+    # Calculate probability
+    temp <- temp[,Pmkn := alpha + lambda * PmknSuffix]
+    temp <- temp[,.(nGram, PmknSuffix, Pmkn)]
+    
+    # Merge into current data table
+    current <- merge(current, temp, by='nGram', all.x = TRUE)
+    
+    # Clear all NA values
+    for (i in seq_along(current)) set(current, i=which(is.na(current[[i]])), j=i, value=0)
+    
+    # Save data table
+    mkn$args$counts[[x]]$data <- current
+    saveObject(mkn$args$counts[[x]])
+    
+  }
+
+
+  nGrams <- lapply(seq_along(mkn$args$model), function(x) {
+    if (x == 1) {
+      message(paste('...estimating', mkn$args$counts[[x]]$fileDesc))
+      current <- loadObject(mkn$args$counts[[x]])
+      current <- current[, Pmkn := alpha]
+      mkn$args$counts[[x]]$data <- current
+      saveObject(mkn$args$counts[[x]])
+      
+    } else {
+      estimate(x)
+    }
+  })
+
+  # Log Results
+  logR('mknEstimate', startTime, ' '  , ' ')
+  
+  # Alert User
+  endTime <- Sys.time()
+  message(paste0('MKN Estimates calculated at ', endTime))
+  message(paste('Elapsed time is', round(difftime(endTime, startTime,  units = 'auto'), 2)))
+}
+## ---- end
+#mknTrain(lm$mkn)

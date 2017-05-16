@@ -1,0 +1,13 @@
+{
+    "path" : "~/Data Science/Data Science Projects/PredictifyR-1.0/documents",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        },
+        {
+            "ascending" : false,
+            "columnIndex" : 4
+        }
+    ]
+}

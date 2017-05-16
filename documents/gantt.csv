@@ -1,0 +1,11 @@
+Task,Start,Duration,Resource
+Conduct NLP Research,5/1/2017,7,j2a
+Data Acquisition,5/8/2017,7,j2b
+Data Cleaning,5/8/2017,7,j2c
+Data Sampling,5/15/2017,7,j2d
+Data Exploration,5/15/2017,7,j2e
+Predictive Model,5/22/2017,7,j2f
+Refine Model,5/29/2017,7,j2g
+Data Product,6/5/2017,7,j2h
+Slide Deck,6/12/2017,7,j2i
+Final Submission,6/19/2017,1,j2j

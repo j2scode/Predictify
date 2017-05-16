@@ -1,0 +1,74 @@
+---
+title: "PredictifyR 1.0 | Word Prediction Application in R using Modified Kneser-Ney Smoothing"
+author: "John James"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+output:
+  rmdformats::readthedown:
+    highlight: kate
+bibliography: NLP.bib
+---
+
+
+```{r load, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
+# Load R Markdown libraries
+library(knitr)
+library(kfigr)
+```
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+# Set options
+knitr::opts_chunk$set(root.dir = "..", warning=F, options(keep.comment = FALSE), comment = NA)
+knitr::opts_chunk$set(fig.path = "../reports/figures", fig.height = 4, fig.width = 10, options(scipen=4))
+knitr::opts_chunk$set(autodep = TRUE)
+knitr::opts_knit$set(kfigr.prefix = T, kfigr.link = T, root.dir = "..")
+knitr::knit_hooks$set(inline = function(x) { if(!is.numeric(x)){ x }else{ prettyNum(x, big.mark=",") } })
+``` 
+
+```{r initEnvironment, echo=F, eval=T, message=F, warning=F, cache=F, results='hide'}
+source('./config/initEnvironment.R')
+```
+
+```{r child = 'A.0-pipeline-clean.Rmd'}  
+```
+
+```{r child = 'B.0-pipeline-design.Rmd'}  
+```
+
+```{r child = 'C.0-pipeline-build.Rmd'}  
+```
+
+```{r child = 'D.0-pipeline-explore.Rmd'}  
+```
+
+```{r child = 'E.0-pipeline-process.Rmd'}  
+```
+
+```{r child = 'F.0-pipeline-model.Rmd'}  
+```
+
+
+```{r child = '0.0-abstract.Rmd'}
+```
+
+```{r child = '1.0-introduction.Rmd'}
+```
+
+```{r child = '2.0-related-work.Rmd'}
+```
+
+```{r child = '3.0-methods.Rmd'}  
+```
+
+```{r child = '4.0-results.Rmd'}
+```
+
+```{r child = '5.0-discussion.Rmd'}
+```
+
+```{r child = '6.0-conclusions.Rmd'}
+```
+
+# References
+
+<div id="refs"></div>
+
