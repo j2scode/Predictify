@@ -281,6 +281,8 @@ corpora = list(
     alpha = list(
       corpusName = 'Training Set Alpha',
       directory = file.path(directories$trainingCorpora, 'alpha'),
+      fileName = 'training-set-alpha',
+      objName = 'trainingSetAlpha',
       documents = lapply(seq_along(registers), function(r) {
         d <- list()
         d$directory <- file.path(directories$trainingCorpora, 'alpha', 'documents')
@@ -301,6 +303,8 @@ corpora = list(
     beta = list(
       corpusName = 'Training Set Beta',
       directory = file.path(directories$trainingCorpora, 'beta'),
+      fileName = 'training-set-beta',
+      objName = 'trainingSetBeta',
       documents = lapply(seq_along(registers), function(r) {
         d <- list()
         d$directory <- file.path(directories$trainingCorpora, 'beta', 'documents')
@@ -321,6 +325,8 @@ corpora = list(
     gamma = list(
       corpusName = 'Training Set Gamma',
       directory = file.path(directories$trainingCorpora, 'gamma'),
+      fileName = 'training-set-gamma',
+      objName = 'trainingSetGamma',
       documents = lapply(seq_along(registers), function(r) {
         d <- list()
         d$directory <- file.path(directories$trainingCorpora, 'gamma', 'documents')
@@ -341,6 +347,8 @@ corpora = list(
     delta = list(
       corpusName = 'Training Set Delta',
       directory = file.path(directories$trainingCorpora, 'delta'),
+      fileName = 'training-set-delta',
+      objName = 'trainingSetDelta',
       documents = lapply(seq_along(registers), function(r) {
         d <- list()
         d$directory <- file.path(directories$trainingCorpora, 'delta', 'documents')
@@ -371,14 +379,6 @@ corpora = list(
       d$fileDesc <- registers[[r]]$fileDesc
       d$objName  <- registers[[r]]$objName
       d
-    }),
-    nGrams = lapply(seq_along(nGrams), function(n) {
-      nGram <- list()
-      nGram$directory <- file.path(directories$validationCorpus, 'nGrams')
-      nGram$objName <- nGrams[[n]]$objName
-      nGram$fileName <- nGrams[[n]]$fileName
-      nGram$fileDesc <- nGrams[[n]]$fileDesc
-      nGram
     })
   ),
   test = list(

@@ -22,7 +22,3 @@ features <- parallelizeTask(verifyLinguistics, clean, pilot, posTags, directorie
 ```{r buildCorpora, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-5), results='hide'}     
 trainingNGrams <- parallelizeTask(buildCorpora, pilotDesign, clean, training, validation, test)
 ```
-
-```{r nGramValidation, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
-validationNGrams <- parallelizeTask(nGramCorpus, validation, directories)   
-```

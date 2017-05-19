@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "\n```{r pilotDataAnalysis, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-6), results='hide'}  \npilotDataAnalysis <- parallelizeTask(analyzeData, 'fast', pilot, referenceFiles, directories, regexPatterns)\n```\n\n```{r diversityAnalysis, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}\ndiversityAnalysis <- parallelizeTask(analyzeDiversity, pilot, pilotDataAnalysis, directories, regexPatterns)   \n```\n\n```{r densityAnalysis, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-7), results='hide'}\ndensityAnalysis <- parallelizeTask(analyzeDensity, pilot$pos, posTags, directories)  \n```\n\n```{r nGramFrequencies, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-7), results='hide'}     \nnGramFreqAnalysis <- parallelizeTask(analyzeNGramFrequencies, pilot$nGrams, directories)\n```\n\n```{r nGramCoverage, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     \nnGramCoverage <- parallelizeTask(analyzeNGramCoverage, pilot$nGrams, directories)\n```\n\n```{r coverageTrainingAlpha, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-6), results='hide'}     \ncoverageTrainingAlpha <- parallelizeTask(analyzeNGramCoverageTraining, training$alpha, validation, directories)   \n```\n\n```{r coverageTrainingBeta, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-7), results='hide'}     \ncoverageTrainingBeta <- parallelizeTask(analyzeNGramCoverageTraining, training$beta, validation, directories)   \n```\n\n```{r coverageTrainingGamma, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-8), results='hide'}     \ncoverageTrainingGamma <- parallelizeTask(analyzeNGramCoverageTraining, training$gamma, validation, directories)   \n```\n\n```{r coverageTrainingDelta, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-9), results='hide'}     \ncoverageTrainingDelta <- parallelizeTask(analyzeNGramCoverageTraining, training$delta, validation, directories)   \n```\n",
+    "created" : 1495210136327.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3880721569",
+    "id" : "E7D34FB6",
+    "lastKnownWriteTime" : 1495217072,
+    "last_content_update" : 1495217072455,
+    "path" : "~/Data Science/Data Science Projects/PredictifyR-1.0/documents/./D.0-pipeline-explore.Rmd",
+    "project_path" : "documents/./D.0-pipeline-explore.Rmd",
+    "properties" : {
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

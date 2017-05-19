@@ -1,39 +1,11 @@
 {
     "sourceWindowGeometry" : {
-        "w3gdtbiv453jm" : {
+        "wt7kplcpaywv4" : {
             "height" : 800,
-            "ordinal" : 3,
-            "width" : 800,
-            "x" : 618,
-            "y" : 129
-        },
-        "wdpy82ag2bg6s" : {
-            "height" : 800,
-            "ordinal" : 2,
+            "ordinal" : 12,
             "width" : 800,
             "x" : 560,
             "y" : 48
-        },
-        "wj1wpkd9j6zki" : {
-            "height" : 800,
-            "ordinal" : 8,
-            "width" : 800,
-            "x" : 734,
-            "y" : 291
-        },
-        "wsl03x0090537" : {
-            "height" : 800,
-            "ordinal" : 7,
-            "width" : 800,
-            "x" : 676,
-            "y" : 210
-        },
-        "wynt4qkmgk5ng" : {
-            "height" : 800,
-            "ordinal" : 6,
-            "width" : 800,
-            "x" : 618,
-            "y" : 129
         }
     }
 }

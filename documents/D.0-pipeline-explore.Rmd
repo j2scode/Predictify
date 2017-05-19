@@ -1,5 +1,5 @@
 
-```{r pilotDataAnalysis, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-7), results='hide'}  
+```{r pilotDataAnalysis, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-6), results='hide'}  
 pilotDataAnalysis <- parallelizeTask(analyzeData, 'fast', pilot, referenceFiles, directories, regexPatterns)
 ```
 
@@ -7,11 +7,11 @@ pilotDataAnalysis <- parallelizeTask(analyzeData, 'fast', pilot, referenceFiles,
 diversityAnalysis <- parallelizeTask(analyzeDiversity, pilot, pilotDataAnalysis, directories, regexPatterns)   
 ```
 
-```{r densityAnalysis, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-8), results='hide'}
+```{r densityAnalysis, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-7), results='hide'}
 densityAnalysis <- parallelizeTask(analyzeDensity, pilot$pos, posTags, directories)  
 ```
 
-```{r nGramFrequencies, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-8), results='hide'}     
+```{r nGramFrequencies, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-7), results='hide'}     
 nGramFreqAnalysis <- parallelizeTask(analyzeNGramFrequencies, pilot$nGrams, directories)
 ```
 
@@ -19,6 +19,18 @@ nGramFreqAnalysis <- parallelizeTask(analyzeNGramFrequencies, pilot$nGrams, dire
 nGramCoverage <- parallelizeTask(analyzeNGramCoverage, pilot$nGrams, directories)
 ```
 
-```{r analyzeNGramCoverageTraining, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-6), results='hide'}     
-nGramCoverageTraining <- parallelizeTask(analyzeNGramCoverageTraining, training, validation, directories) 
+```{r coverageTrainingAlpha, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-6), results='hide'}     
+coverageTrainingAlpha <- parallelizeTask(analyzeNGramCoverageTraining, training$alpha, validation, directories)   
+```
+
+```{r coverageTrainingBeta, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-7), results='hide'}     
+coverageTrainingBeta <- parallelizeTask(analyzeNGramCoverageTraining, training$beta, validation, directories)   
+```
+
+```{r coverageTrainingGamma, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-8), results='hide'}     
+coverageTrainingGamma <- parallelizeTask(analyzeNGramCoverageTraining, training$gamma, validation, directories)   
+```
+
+```{r coverageTrainingDelta, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-9), results='hide'}     
+coverageTrainingDelta <- parallelizeTask(analyzeNGramCoverageTraining, training$delta, validation, directories)   
 ```

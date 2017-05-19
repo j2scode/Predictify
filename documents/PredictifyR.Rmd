@@ -1,5 +1,5 @@
 ---
-title: "PredictifyR 1.0 | Word Prediction Application in R using Modified Kneser-Ney Smoothing"
+title: "PredictifyR 1.0 | Modified Kneser-Ney Word Prediction Application in R"
 author: "John James"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output:
