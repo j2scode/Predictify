@@ -1,6 +1,6 @@
 
-```{r pilotDataAnalysis, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-5), results='hide'}  
-pilotDataAnalysis <- parallelizeTask(analyzeData, 'fast', pilot, referenceFiles, directories, regexPatterns)  
+```{r pilotDataAnalysis, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-7), results='hide'}  
+pilotDataAnalysis <- parallelizeTask(analyzeData, 'fast', pilot, referenceFiles, directories, regexPatterns)
 ```
 
 ```{r diversityAnalysis, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}
@@ -11,14 +11,14 @@ diversityAnalysis <- parallelizeTask(analyzeDiversity, pilot, pilotDataAnalysis,
 densityAnalysis <- parallelizeTask(analyzeDensity, pilot$pos, posTags, directories)  
 ```
 
-```{r nGramFrequencies, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-9), results='hide'}     
+```{r nGramFrequencies, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-8), results='hide'}     
 nGramFreqAnalysis <- parallelizeTask(analyzeNGramFrequencies, pilot$nGrams, directories)
 ```
 
-```{r nGramCoverage, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-9), results='hide'}     
+```{r nGramCoverage, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
 nGramCoverage <- parallelizeTask(analyzeNGramCoverage, pilot$nGrams, directories)
 ```
 
-```{r exploreTraining, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
-trainingDataAnalysis = parallelizeTask(exploreTraining, training, validation, directories) 
+```{r analyzeNGramCoverageTraining, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-6), results='hide'}     
+nGramCoverageTraining <- parallelizeTask(analyzeNGramCoverageTraining, training, validation, directories) 
 ```

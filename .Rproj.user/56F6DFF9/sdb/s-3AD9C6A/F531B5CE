@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "\n```{r build, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     \nparallelizeTask(buildPilot, clean, pilot, pilotDesign$pilot)     \n```\n\n```{r tagPilot, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     \npilotPos <- parallelizeTask(tagCorpus, pilot)   \n```\n\n```{r nGramPilot, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-2), results='hide'}     \npilotNGrams <- parallelizeTask(nGramCorpus, pilot, directories)   \n```\n\n```{r verifyVocabulary, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-3), results='hide'}     \ncoverage <- parallelizeTask(verifyVocabulary, clean, pilot, directories)\n```\n\n```{r verifyFeatures, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-4), results='hide'}     \nfeatures <- parallelizeTask(verifyLinguistics, clean, pilot, posTags, directories)  \n```\n\n```{r buildCorpora, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-5), results='hide'}     \ntrainingNGrams <- parallelizeTask(buildCorpora, pilotDesign, clean, training, validation, test)\n```\n\n```{r nGramValidation, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     \nvalidationNGrams <- parallelizeTask(nGramCorpus, validation, directories)   \n```\n",
+    "created" : 1495170012817.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3159180293",
+    "id" : "F531B5CE",
+    "lastKnownWriteTime" : 1495170763,
+    "last_content_update" : 1495173094368,
+    "path" : "~/Data Science/Data Science Projects/PredictifyR-1.0/documents/C.0-pipeline-build.Rmd",
+    "project_path" : "documents/C.0-pipeline-build.Rmd",
+    "properties" : {
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

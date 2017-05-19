@@ -93,11 +93,12 @@ trainLNRE <- function(modelNum, sampleDocSpc) {
 #' evaluate various samples sizes and associated OOV Rates.
 #' 
 #' @param korpus - the meta data for the HC Corpus
+#' @param analysis - the analysis of the HC Corpus
 #' @param directories - the project directory structure
 #' @return estimate - list of data frames containing coverage estimates 
 #' @author John James
 #' @export
-estimateSampleSize <- function(korpus, directories) {
+estimateSampleSize <- function(korpus, analysis, directories) {
   
   startTime <- Sys.time()
   message(paste('\nEstimating vocabulary-based Sample size', startTime))
@@ -190,7 +191,7 @@ estimateSampleSize <- function(korpus, directories) {
   
   # Format Summary Row
   register <- 'Corpus'
-  percent <- mean(ss$percent)
+  percent <- sum(ss$size) / analysis$featureMatrix$tokens[4]
   size <- sum(ss$size)
   vSample <- sum(ss$vSample)
   vExt <- sum(ss$vExt)

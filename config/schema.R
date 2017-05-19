@@ -366,11 +366,19 @@ corpora = list(
     objName = 'validationSet',
     documents = lapply(seq_along(registers), function(r) {
       d <- list()
-      d$directory <- directories$validationCorpus
+      d$directory <- file.path(directories$validationCorpus, 'documents')
       d$fileName <- registers[[r]]$fileName
       d$fileDesc <- registers[[r]]$fileDesc
       d$objName  <- registers[[r]]$objName
       d
+    }),
+    nGrams = lapply(seq_along(nGrams), function(n) {
+      nGram <- list()
+      nGram$directory <- file.path(directories$validationCorpus, 'nGrams')
+      nGram$objName <- nGrams[[n]]$objName
+      nGram$fileName <- nGrams[[n]]$fileName
+      nGram$fileDesc <- nGrams[[n]]$fileDesc
+      nGram
     })
   ),
   test = list(

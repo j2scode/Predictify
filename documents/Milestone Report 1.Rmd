@@ -1,5 +1,5 @@
 ---
-title: "PredictifyR | Integrated Word Prediction Model - Milestone Report 1"
+title: "PredictifyR | Modified Kneser-Ney Word Prediction - Milestone Report"
 author: "John James"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output:
@@ -31,11 +31,6 @@ knitr::knit_hooks$set(inline = function(x) { if(!is.numeric(x)){ x }else{ pretty
 
 ```{r initEnvironment, echo=F, eval=T, message=F, warning=F, cache=F, results='hide'}
 source('./config/initEnvironment.R')
-```
-
-```{r cacheSetup, echo=F, eval=T, message=F, warning=F, cache=F, results='hide'}
-opts_chunk$set(cache.extra = docSource)
-
 ```
 
 ```{r child = 'A.0-pipeline-analysis.Rmd'}  

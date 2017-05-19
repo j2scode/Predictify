@@ -3,18 +3,26 @@
 parallelizeTask(buildPilot, clean, pilot, pilotDesign$pilot)     
 ```
 
-```{r nGramPilot, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
+```{r tagPilot, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
+pilotPos <- parallelizeTask(tagCorpus, pilot)   
+```
+
+```{r nGramPilot, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-2), results='hide'}     
 pilotNGrams <- parallelizeTask(nGramCorpus, pilot, directories)   
 ```
 
-```{r verifyVocabulary, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
+```{r verifyVocabulary, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-3), results='hide'}     
 coverage <- parallelizeTask(verifyVocabulary, clean, pilot, directories)
 ```
 
-```{r verifyFeatures, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-3), results='hide'}     
+```{r verifyFeatures, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-4), results='hide'}     
 features <- parallelizeTask(verifyLinguistics, clean, pilot, posTags, directories)  
 ```
 
-```{r buildCorpora, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-4), results='hide'}     
+```{r buildCorpora, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-5), results='hide'}     
 trainingNGrams <- parallelizeTask(buildCorpora, pilotDesign, clean, training, validation, test)
+```
+
+```{r nGramValidation, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
+validationNGrams <- parallelizeTask(nGramCorpus, validation, directories)   
 ```
