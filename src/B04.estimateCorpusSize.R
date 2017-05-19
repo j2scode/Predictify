@@ -4,19 +4,16 @@
 #------------------------------------------------------------------------------#
 #'  estimateCorpusSize 
 #' 
-#' This function takes the meta data for the corpus, the meta data for the 
-#' registers, the posTags and the directory structure and provides an 
-#' estimate of total corpus size based upon the distribution of lexical 
-#' features per n000-word samples of the text.
+#' This function provides an  estimate of total corpus size based upon the 
+#' distribution of lexical  features per n000-word samples of the text.
 #' 
 #' @param korpus - the meta data for the corpus
-#' @param registers - the meta data for the registers
 #' @param posTags - selected POS tags
 #' @param directories - the project directory structure
 #' @return corpusSize - the corpus size estimate with summary tables
 #' @author John James
 #' @export
-estimateCorpusSize <- function(korpus, registers, posTags, directories) {
+estimateCorpusSize <- function(korpus, posTags, directories) {
   
   startTime <- Sys.time()
   
@@ -29,11 +26,8 @@ estimateCorpusSize <- function(korpus, registers, posTags, directories) {
   
   # Read and combine corpus into single document
   message('...loading file')
-  filePath <- list()
-  filePath$directory <- korpus$directory
-  document <- unlist(lapply(seq_along(registers), function(x) {
-    filePath$fileName <- registers[[x]]$fileName
-    readFile(filePath)
+  document <- unlist(lapply(seq_along(korpus$documents), function(x) {
+    readFile(korpus$documents[[x]])
   }))
   
   # Convert to word tokens

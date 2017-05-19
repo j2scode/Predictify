@@ -12,7 +12,7 @@ Several Natural Language Processing (NLP) software packages provided essential f
 
 Source code is available and can be forked from https://github.com/j2scode/PredictifyR.
 
-## Data Acquisition
+## Corpus
 The corpus used for this project was obtained from the HC Corpora website, a collection of freely available texts comprised of over 2.5 billion words from 67 languages [@Christensen2016]. The English language corpus, consisting of approximately 70 million words across three registers: news, blogs, and twitter feeds, was used for this project. The descriptive statistics are as follows:
 
 `r figr("rawCorpusSummary-M", TRUE, type="Table")`: Raw Corpus Descriptive Statistics
@@ -23,21 +23,22 @@ kable(rawCorpusSummary, digits = 2, format.args = list(big.mark = ','))
 
 The following priori qualitative analysis establishes the author's reasons for accepting the corpus as qualitatively representative of the situations, linguistic features, and lexical variation to be encountered in a mobile word prediction context. 
 
-### Blogs Register 
+### Corpus Registers
+#### Blogs Register 
 The blogs register, comprised of `r rawDataAnalysis$featureMatrix$sentences[1]` sentences, `r rawDataAnalysis$featureMatrix$words[1]` words, and `r rawDataAnalysis$featureMatrix$wordTypes[1]` types, covered a range of topics to a diverse, unenumerated public audience. Interaction ranged from minimal to extensive, the size of the audience, and the nature of the content. Based upon available research, the blogger was likely 21-to-35 years of age, as this group accounted for some 53% of the total blogger population, followed by the 21 and less age group which constituted some 20% of the blogger population [@Kennon2015]. Content ranged from factual to imaginative, and served to persuade, inform, entertain, instruct, explain, share opinions, and raise one's social / professional profile. This register would be characterized by a wide continuum of formal and informal text, low to moderate use of slang, and a greater dispersion of lexical variety among the samples. Language models may have to accommodate liberal use of common internet or specialized content abbreviations. 
 
-### News Register
+#### News Register
 The smallest of the registers, the online news content contained some `r rawDataAnalysis$featureMatrix$sentences[2]` sentences, `r rawDataAnalysis$featureMatrix$words[2]` words, and `r rawDataAnalysis$featureMatrix$wordTypes[2]` word types, Likely produced in institutional or business settings, the news content could be characterized as factual, informative, opinion-based, and with the exception of public opinion pages, non-interactive. Addressed to an unenumerated public, the news register would be characterized by greater formality, the use of standard English, few idioms and slang expressions, and relatively high degree of lexical diversity. Statistical language models that capture the lexical diversity of the population are likely to perform well, as should topic-based or semantic language models. 
 
-### Twitter Register 
+#### Twitter Register 
 The twitter register, comprised of so-called "tweets" - text messages of 140 characters or less, were produced in largely personal-private settings on computers and on mobile phones. The addressees included the enumerated network of "friends", the enumerated members of groups to which the "tweeter" was subscribed, and, since messages could be "retweeted", the unenumerated public. According to Duggan (2015), 23% of internet users used twitter in 2015, the 18-29 age group represented the most prolific user group, followed by the 30-49 age group. Thirty-two percent of internet users age 18-29 (40% of all twitter users) and 29% of those age 30-49 (36% of all twitter users), used twitter [@Duggan2015]. Consisting of some `r rawDataAnalysis$featureMatrix$sentences[3]` sentences, `r rawDataAnalysis$featureMatrix$words[3]` words, and `r rawDataAnalysis$featureMatrix$wordTypes[3]` types, tweets tended to be opinion oriented with occasional supporting facts and served a range of purposes. Meeting new people from various backgrounds and locations, establishing and maintaining connections with others, grow friendships, and raising one's social media profile are among the many purposes of the tweet. Twitter content was likely to be characterized by informality, greater use of idioms and slang, non-standard spelling, and a lower degree of lexical richness.
 
 Combined, these registers reflect the situational and therefore, linguistic diversity representative of the population of content for which word prediction functionality would be used.
 
-### Reference Data
+#### Reference Data
 In addition, supporting reference data used in this project included a list of commonly used English language contractions [@Wikipedia2016], a list of profane words courtesy of Google's What Do You Love Project [@Google2012], a file containing common internet and text messaging abbreviations was obtained from Wiktionary [@Wiktionary2016] and a collection of emoticons was similarly compiled from Internet sources [@Cool-Smileys2010]. Each source was manually sanitized, and conditioned to eliminate ambiguity, profanity, and conflicts. All reference files are freely available as csv files and can be downloaded from the data/referenceData subdirectory at https://github.com/j2scode/PredictifyR. 
 
-## Data Cleaning
+### Data Acquisition
 The corpus was downloaded from the HC Corpora website [@Christensen2016], reshaped into sentences the raw corpus was organized by line, some having multiple sentences), and audited for data quality issues.  The following summary `r figr("rawCorpusAudit-M", TRUE, type="Table")` reveals several anomalies that were addressed during the data cleaning process.
 
 `r figr("rawCorpusAudit-M", TRUE, type="Table")`: Raw Corpus Audit
@@ -46,6 +47,7 @@ audit <- plotCorpusAudit(rawDataAnalysis)
 kable(audit, digits = 2, format.args = list(big.mark = ','))
 ```
 
+### Data Cleaning
 The corpus contained some `r round(rawDataAnalysis$featureMatrix$tokens[4], -3)` tokens, of which approximately `r round(rawDataAnalysis$featureMatrix$words[4] / rawDataAnalysis$featureMatrix$tokens[4] * 100, 0)` % were words. Special characters (about `r round(audit$'% Special'[4], 0)` % of the corpus), punctuation, symbols and digital characters made up the rest. An inspection of words exceeding 40 characters in length revealed repeated string patterns, urls, email addresses, and various anomalies that could be eliminated in preprocessing. Somewhat surprisingly, contractions, common abbreviations and profanity made up less than `r round(sum(audit$'% Misspellings'[4],audit$'% Contractions'[4],audit$'% Abbreviations'[4], audit$'% Profanity'[4],0.5), digits = 0)` % of the corpus.  
 
 During the cleaning process, the raw data were reshaped into sentences using the quanteda package [@Benoit2016b] and converted to lower case. Non UTF-8 encoding was corrected and special, control, non-printable, and non-ASCII characters were removed. Approximately 230 common misspellings, contractions, and abbreviations, were normalized. Email addresses, urls, and twitter hashtags were excised from the text. Hyphenated words were split and digits, symbols and punctuation (with the exception of the apostrophe not surrounded by whitespace, periods, exclamation points, and question marks) were extracted. Lastly, profanity and words exceeding 40 characters in length were eliminated. Stop words, made up largely of function words, were retained. Due to the size of the corpus and the processing speeds of available spell checkers, automated spell checking and correction was not performed.
@@ -60,12 +62,14 @@ kable(audit, digits = 2, format.args = list(big.mark = ','))
 
 Weighing in at about `r audit$Size[4]` Mb, the corpus contains a vocabulary of `r audit$Types[4]` words. An N-gram language model based upon this corpus with $V^2$ = `r audit$Types[4]^2` bigrams and  $V^3$ = `r audit$Types[4]^3` trigrams, would approach memory capacity, especially for a mobile device.  The following section outlines the design process for a compact, yet representative corpora.
 
-## Pilot Corpus 
+## Model Corpora
 An intrinsic evaluation of any language model requires a training corpus, a separate development test set, and an unseen test set for final model evaluation. Typically, 80% of the data are designated for training, 10% for development and 10% for testing. However, training on a large corpus such as the HC Corpora with a vocabulary $V$ of some `r rawDataAnalysis$featureMatrix$wordTypes[4]` can present some practical and performance problems. Chiefly, the N-gram probability matrices can be unwieldy, exceedingly sparse, and computationally expensive. There would be $V^2$ = `r rawDataAnalysis$featureMatrix$wordTypes[4] ** 2` possible bigrams and the number of possible trigrams would be $V^3$ = `r rawDataAnalysis$featureMatrix$wordTypes[4] ** 3`. A prediction model that could run on a mobile device must balance potentially lower test set perplexity (higher accuracy) with computational and response time performance considerations. As such, intelligent sampling from the master corpus must produce a language model corpus which maximizes representativeness and minimizes size.
 
 Representativeness, in the context of this project, has a two part definition. First, the lexical resource should represent the range of **lexical diversity** in the HC Corpus.  That is, the number of out-of-vocabulary (OOV) words in the lexical resource should be below some established threshold. The target for this project was 95% coverage, or no more than 5% OOV *tokens*. Second, the lexical resource should represent the distribution of **linguistic features** or part-of-speech tags in the HC Corpus. 
 
-Therefore, the aim at this stage was to identify a minimum size **pilot corpus** that was representative of the HC Corpus according to the above definition. The pilot corpus would seed the training, validation and test sets.  Two analyses were undertaken to address the question of representativeness.  The lexical diversity analysis applied Zipf's law and word frequency distribution analysis to the problem of language coverage and lexical size.  The lexical feature analysis examined the distribution of lexical features to ascertain optimal lexical size. 
+Therefore, the aim at this stage was to identify a minimum size **pilot corpus** that was representative of the HC Corpus according to the above definition. Since the language model will be evaluated on training sets of various sizes, the training sets would be comprised of 2-10 pilot corpora and the validation and training sets would constitute a two pilot corpora each.
+
+Two analyses were undertaken to address the question of representativeness.  The lexical diversity analysis applied Zipf's law and word frequency distribution analysis to the problem of language coverage and lexical size.  The lexical feature analysis examined the distribution of lexical features to ascertain optimal sampling unit, register, and overall corpus size. 
 
 ### Lexical Diversity Analysis
 Here, Zipf's law and word frequency distribution analysis revealed an estimate of optimal lexical size given the coverage target. This section includes a review of Zipf's law, an overview of how it is used to estimate lexical size, an evaluation of good-of-fit, a summary of the Zipf-Mandelbrot model, and the lexical size estimate.  Finally, the sample corpus is created and the OOV rate, vis-a-vis the HC Corpus is verified. 
@@ -264,7 +268,7 @@ In order to test whether the pilot corpus was truly representative, two tests we
 #### Vocabulary Verification
 The following table summarizes the vocabulary and token OOV rates for the pilot corpus.
 
-`r figr("vocabularyVerification-M", TRUE, type="Table")`: Training corpus vocabulary OOV Rates
+`r figr("vocabularyVerification-M", TRUE, type="Table")`: Pilot corpus vocabulary OOV Rates
 ```{r vocabularyVerification-M, echo=F, message=FALSE,  eval=T, results='asis'}
 kable(coverage, digits = c(0,0,0,0,2), format.args = list(big.mark = ','))
 ```
@@ -279,43 +283,46 @@ Chi-squared tests were conducted on the distributions of POS tags in the HC and 
 kable(features$means, digits = 4, format.args = list(big.mark = ','))
 ```
 
-The high p-Value indicated that there was a `r round(features$pValue * 100, 1)` percent chance that the differences were due to chance.  Therefore, the hypothesis is not rejected and the Pilot Corpus represents the range of lexical variation of the HC Corpus.
+The high p-Value indicated that there was a `r round(features$pValue * 100, 1)` percent chance that the differences were due to chance. Therefore, the hypothesis is not rejected and the Pilot Corpus represents the range of lexical variation of the HC Corpus.
 
-### Summary of Sampling Strategy
-To sum up, two analyses were conducted in order to develop the smallest possible representative **pilot corpus**.  In the lexical diversity analysis, linear models based upon the Zipf Mandelbrot law provided sample sizes estimates based upon the distribution of word frequencies.  The lexical feature analysis determined sample size in terms of chunk size and number of chunks, for each register based upon the variation in the distributions of lexical features. Taking the larger of the two estimates for the pilot corpus, test were conducted to ensure that the pilot corpus was indeed representative of the HC Corpus. Coverage analysis showed that over 95% of the tokens in the HC Corpus could be obtained with `r round(sum(estimates$sampleSize$size) / cleanDataAnalysis$featureMatrix$tokens[4] * 100, 0)` percent of the HC Corpus. Chi-squared comparisons of the lexical feature distributions showed that the pilot corpus included the range and distribution of lexical features HC Corpus. 
-
+Having established a representative pilot corpus, the training, validation, and test sets were designated as described in the next section.
+.
 ### Model Corpora Design
-The model corpora included the training, validation, and test corpora. The validation and test sets would be allocated on 5% pilot corpus each. As `r figr("corporaDesign-M", TRUE, type="Table")`, the language model will be evaluated on training sets of 10%, 20%, 35% and 50% of the HC Corpus.
+The model corpora, consisting of four training sets, a validation set and a test set would be comprised of one or more pilot corpora.  Training sets alpha, beta, gamma, and delta would contain two, four, seven, and ten pilot corpora respectively.  This amounted to about 10%, 20%, 35%, and 50% of the HC Corpus. The validation and test sets would be comprised of a two pilot corpora each, accounting for about 10% of the HC Corpus, respectively. The design is summarized below.
 
-`r figr("corporaDesign-M", TRUE, type="Table")`: The model corpora design. Training sets are alpha thru delta.
+`r figr("corporaDesign-M", TRUE, type="Table")`: Model Corpora Design
 ```{r corporaDesign-M, echo=F, message=FALSE,  eval=T, results='asis'}
 kable(pilotDesign$corporaDesign, digits = 0, format.args = list(big.mark = ','))
 ```
 
-The next section summarizes the **exploratory data analysis** of the **delta** training set.
 
-## Exploratory Data Analysis
-The qualitative and quantitative exploratory data analysis (EDA) summarized in this section was focused on identifying features in the **training set** that could be exploited in the language model. Starting with the descriptive statistics, the report examines word nGram frequencies, lexical feature distributions, and POS nGram occurrences.
+### Model Corpora Design Summary
+To sum up, two analyses were conducted in order to develop the smallest possible representative **pilot corpus**.  In the lexical diversity analysis, linear models based upon the Zipf Mandelbrot law provided sample sizes estimates based upon the distribution of word frequencies.  The lexical feature analysis determined sample size in terms of chunk size and number of chunks, for each register based upon the variation in the distributions of lexical features. Taking the larger of the two estimates for the pilot corpus, test were conducted to ensure that the pilot corpus was indeed representative of the HC Corpus. Coverage analysis showed that over 95% of the tokens in the HC Corpus could be obtained with `r round(sum(estimates$sampleSize$size) / cleanDataAnalysis$featureMatrix$tokens[4] * 100, 0)` percent of the HC Corpus. Chi-squared comparisons of the lexical feature distributions showed that the pilot corpus included the range and distribution of lexical features HC Corpus. 
 
-### Descriptive Statistics
+## Exploratory Data Analysis (EDA)
+The qualitative and quantitative exploratory data analysis (EDA) summarized in this section was conducted on a pilot corpus as well as the four training sets. An examination of the pilot corpus provided a sense of the lexical and linguistic features, their distributions, n-grams and frequencies.  The training set evaluation focused on lexical coverage of the various training sets vis-a-vis the validation set.  
+
+### Pilot Corpus EDA
+
+#### Descriptive Statistics
 The following table outlines the descriptive statistics for the training corpus.
 
-`r figr("trainingSetStats-M", TRUE, type="Table")`: Training Set Descriptive Statistics
-```{r trainingSetStats-M, echo=F, message=FALSE,  eval=T, results='asis'}
-training <- plotCorpusSummary(trainingDataAnalysis)
-kable(training, digits = 0, format.args = list(big.mark = ','))
+`r figr("pilotStatistics-M", TRUE, type="Table")`: Pilot Corpus Descriptive Statistics
+```{r pilotStatistics-M, echo=F, message=FALSE,  eval=T, results='asis'}
+pilotStats <- plotCorpusSummary(pilotDataAnalysis)
+kable(pilotStats, digits = 0, format.args = list(big.mark = ','))
 ```
 
-Reducing the size of the corpus by `r round((cleanDataAnalysis$featureMatrix$tokens[4] - trainingDataAnalysis$featureMatrix$tokens[4]) / cleanDataAnalysis$featureMatrix$tokens[4] * 100, 0)`% while retaining the lexical diversity and feature distribution of the HC Corpus, was the **key finding** of this analysis.
+Reducing the size of the corpus by `r round((cleanDataAnalysis$featureMatrix$tokens[4] - pilotDataAnalysis$featureMatrix$tokens[4]) / cleanDataAnalysis$featureMatrix$tokens[4] * 100, 0)`% while retaining the lexical diversity and feature distribution of the HC Corpus, was the **key finding** of this analysis.
 
-### Lexical Diversity Analysis
+#### Lexical Diversity Analysis
 Lexical diversity, or richness, is a measure of the different words that are used in a text. Various measures of lexical richness: Yule’s K [@Yule1944a], the Zipf slope [@Zipf1935], the type-token ratio, Herdan’s C [@Herdan1960], Guiraud’s R [@Guiraud1954a], the mean log frequency [@Carroll1967], the Mean Segmental Type-Token Ratio [@Johnson1944a] and the vocabulary growth rate (the ratio of hapax legomena to tokens sampled) [@R.H.Baayen2008] were calculated and plotted cumulatively over samples from each register. Since the lexical diversity measures above are sensitive to sample size, the lexical diversity measures were computed on single samples of `r max(diversityAnalysis$measures[[1]]$Tokens)` tokens taken from each register.
 
 ```{r diversityPlots-M, echo=F, eval=T, message=F, warning=F, cache=F}
 diversityPlots <- plotDiversityFigure(diversityAnalysis$measures)
 do.call(grid.arrange, c(diversityPlots, ncol = 4, top = "Corpus Lexical Diversity Analysis"))
 ```
-`r figr("diversityPlots-M", TRUE, type="Figure")`: Training Corpus Lexical Diversity Analysis
+`r figr("diversityPlots-M", TRUE, type="Figure")`: Pilot Corpus Lexical Diversity Analysis
 
 The curvilinear distribution of word types (upper left), shows that vocabulary growth is relatively stable within text segments, but the occurrences of new types decrease throughout the course of the text. The vocabulary growth rate is the probability of encountering an unseen type, after having read $N$ tokens, and is estimated by the ratio of the number of hapax legomena (types of frequency 1), to the number of tokens, $N$. The type token ratio decreased rapidly as the number of tokens read approached approximately 100,000 tokens, then decreased at a slower rate as the number of tokens read increased. The mean log frequency is the average frequency of all words that appear up to $N$ tokens read. Herdan's C is the ratio of the log of the vocabulary size $V$ and tokens $N$ [@Herdan1960]. Guiraud's R is the ratio of the vocabulary $V$ and the square root of the number of tokens $N$. Yule's K, often used for author attribution of literary texts, is a measure of lexical repetition that is independent of text size. Finally, Zipf's Slope [@Baayen2013] is Zipf's rank-frequency curve in the double-logarithmic space.
 
@@ -330,17 +337,17 @@ kable(diversityTable, digits = 2, format.args = list(big.mark = ','))
 
 Consistent with the priori supposition, the news register appeared to have the greatest degree of lexical diversity across all measures; whereas, the twitter register had the least. They **key finding** is that the lexical diversity-based register sample size estimates were consistent with the register lexical diversity measures in this analysis. The greater the lexical diversity of a register, the greater the sampling proportion required to representative.
 
-### Lexical Density Analysis
+#### Lexical Density Analysis
 Lexical density, the ratio of content words (nouns, adjectives, verbs, adverbs) to all words in a text, is an estimated measure of content within a text. While N-Gram models work well with function words, they tend to underperform in content word prediction.  Incorporating semantic information contained in content words can improve overall prediction accuracy.  Lexical density measures can indicate the degree to which semantic analysis can improve overall prediction accuracy.
 
-`r figr("densityAnalysis-M", TRUE, type="Table")`: Lexical Density Analysis of Training Corpus
+`r figr("densityAnalysis-M", TRUE, type="Table")`: Lexical Density Analysis of Pilot Corpus
 ```{r densityAnalysis-M, echo=F, eval=T, message=F, warning=F, cache=F}
 kable(densityAnalysis, digits = 1, format.args = list(big.mark = ','))
 ```
 
 Overall density for the corpus was `r round(densityAnalysis$Density[4],0)`%, with the news register leading the group at `r round(max(densityAnalysis$Density),0)`%.  The blogs register, somewhat surprisingly, had the lowest percentage of content words. The **key finding**, in any case, was the seemingly low level of lexical density in the corpus. The potential impact of semantic analysis on prediction accuracy remained an open question at this stage of the analysis.
 
-### Lexical Feature Analysis
+#### Lexical Feature Analysis
 The following plot depicts the distribution of select lexical features commonly used in variation studies.
 ```{r trainLexicalFeatures-M, fig.height=5, echo=F, eval=T, message=F, warning=F, cache=T}
 trainLexicalFeatures <- plotLexicalFeatures(features$analyses[[2]]$chunkMatrix, posTags)
@@ -351,20 +358,20 @@ trainLexicalFeatures
 As found in the master corpus, singular nouns were most common, followed by personal pronouns, plural nouns, adjectives and adverbs.  WH-clauses were rare and highly varied throughout the corpus. The **key finding** was that the range and distribution of lexical features across registers, was a positive indication for an integrated word and POS-based N-Gram prediction model. 
 
 
-### Word N-Gram Frequency Distribution Analysis
-```{r loadCleanTextNGrams-M, echo=F, message=FALSE, cache=T, results='hide'}
-nGrams <- loadNGrams(corpora$training$clean$nGrams$text)
+#### Word N-Gram Frequency Distribution Analysis
+```{r loadPilotNGrams-M, echo=F, message=FALSE, cache=T, results='hide'}
+nGrams <- loadNGrams(corpora$pilot$nGrams)
 ```
 
 Here, the frequency distribution of word N-Grams was evaluated vis-a-vis a zipfian distribution. This analysis intimates the validity of zipf-based inferences on downstream language modeling tasks, such as language model pruning. zipf plots reveal the extent to which the frequencies of nGrams modeled a zipfian distribution.
 ```{r nGramZipfPlots-M, echo=F, message=FALSE, results='asis', cache=T}
-zPlot <- plotZipf(nGramFreqAnalysis[[1]]$tfl, register = 'Training Corpus Unigrams', color = 'orangered3')
+zPlot <- plotZipf(nGramFreqAnalysis[[1]]$tfl, register = 'Pilot Corpus Unigrams', color = 'orangered3')
 unigramZipfPlot <- zPlot$zipf
-zPlot <- plotZipf(nGramFreqAnalysis[[2]]$tfl, register = 'Training Corpus Bigrams', color = 'navyblue')
+zPlot <- plotZipf(nGramFreqAnalysis[[2]]$tfl, register = 'Pilot Corpus Bigrams', color = 'navyblue')
 bigramZipfPlot <- zPlot$zipf
-zPlot <- plotZipf(nGramFreqAnalysis[[3]]$tfl, register = 'Training Corpus Trigrams', color = 'springgreen4')
+zPlot <- plotZipf(nGramFreqAnalysis[[3]]$tfl, register = 'Pilot Corpus Trigrams', color = 'springgreen4')
 trigramZipfPlot <- zPlot$zipf
-zPlot <- plotZipf(nGramFreqAnalysis[[3]]$tfl, register = 'Training Corpus quadgrams', color = 'firebrick4')
+zPlot <- plotZipf(nGramFreqAnalysis[[3]]$tfl, register = 'Pilot Corpus quadgrams', color = 'firebrick4')
 quadgramZipfPlot <- zPlot$zipf
 grid.arrange(unigramZipfPlot, bigramZipfPlot, trigramZipfPlot, quadgramZipfPlot, nrow = 2)
 ```
@@ -373,26 +380,26 @@ grid.arrange(unigramZipfPlot, bigramZipfPlot, trigramZipfPlot, quadgramZipfPlot,
 
 The **key finding**, as shown in `r figr("nGramZipfPlots-M", TRUE, type="Figure")`, was that the visual indication of goodness-of-fit revealed systematic deviations from a zipfian distribution.  Any downstream word frequency based decisions would require a LNRE model such as the Zipf-Mandelbrot [@Mandelbrot61] model used during the corpus design phase.
 
-### Word N-Gram Coverage Analysis
-This section examines the numbers of total n-grams covered as new n-grams are introduced in order of descending frequency.  Again, this analysis would inform any language model pruning required downstream.  
+#### Word N-Gram Coverage Analysis
+This section examines the numbers of total n-grams covered as new n-grams are introduced.  Again, this analysis would inform any language model pruning required downstream.  
 ```{r nGramCoveragePlots-M, echo=F, message=FALSE, results='asis', cache=T}
-coveragePlot <- plotNGramCoverage(nGramCoverage[[1]], type = 'Training Corpus Unigrams', color = 'orangered3')
+coveragePlot <- plotNGramCoverage(nGramCoverage[[1]], type = 'Pilot Corpus Unigrams', color = 'orangered3')
 unigramCoveragePlot <- coveragePlot
-coveragePlot <- plotNGramCoverage(nGramCoverage[[2]], type = 'Training Corpus Bigrams', color = 'navyblue')
+coveragePlot <- plotNGramCoverage(nGramCoverage[[2]], type = 'Pilot Corpus Bigrams', color = 'navyblue')
 bigramCoveragePlot <- coveragePlot
-coveragePlot <- plotNGramCoverage(nGramCoverage[[3]], type = 'Training Corpus Trigrams', color = 'springgreen4')
+coveragePlot <- plotNGramCoverage(nGramCoverage[[3]], type = 'Pilot Corpus Trigrams', color = 'springgreen4')
 trigramCoveragePlot <- coveragePlot
-coveragePlot <- plotNGramCoverage(nGramCoverage[[4]], type = 'Training Corpus quadgrams', color = 'firebrick4')
+coveragePlot <- plotNGramCoverage(nGramCoverage[[4]], type = 'Pilot Corpus quadgrams', color = 'firebrick4')
 quadgramCoveragePlot <- coveragePlot
 grid.arrange(unigramCoveragePlot, bigramCoveragePlot, trigramCoveragePlot, quadgramCoveragePlot, nrow = 2)
 ```
 
 `r figr("nGramCoveragePlots-M", TRUE, type="Figure")`: Word N-Gram Coverage 
 
-Each plot is annotated with the number of N-Grams required to achieve 50%, 75%, and 95% coverage of all N-Grams in the Training Corpus. Despite the deviations from the zipf distribution, the unigram coverage data behaved in a rather "zipfian" manner.  On the other hand, the coverage curves for the bigrams, trigrams, and quadgrams didn't reflect a "zipfian" behavior in the least. The trigram and quadgram coverage plots are nearly linear.  The **key finding** of this analysis was that any pruning from the higher-order n-grams would have a significant and detrimental affect on coverage, and prediction accuracy.
+Each plot is annotated with the number of N-Grams required to achieve 50%, 75%, and 95% coverage of all N-Grams in the Pilot Corpus. Despite the deviations from the zipf distribution, the unigram coverage data behaved in a rather "zipfian" manner.  On the other hand, the coverage curves for the bigrams, trigrams, and quadgrams didn't reflect a "zipfian" behavior in the least. The trigram and quadgram coverage plots are nearly linear.  The **key finding** of this analysis was that any pruning from the higher-order n-grams would have a significant and detrimental affect on coverage, and prediction accuracy.
 
-### Word N-Gram Feature Analysis
-The training corpus comprised some `r nGrams[[1]]@Dim[2]` unigrams, `r nGrams[[2]]@Dim[2]` bigrams, `r nGrams[[3]]@Dim[2]` trigrams, and `r nGrams[[4]]@Dim[2]` quadgrams. The following illuminates the top 50 features by frequency for each N-Gram order.
+#### Word N-Gram Feature Analysis
+The pilot corpus comprised some `r nGrams[[1]]@Dim[2]` unigrams, `r nGrams[[2]]@Dim[2]` bigrams, `r nGrams[[3]]@Dim[2]` trigrams, and `r nGrams[[4]]@Dim[2]` quadgrams. The following illuminates the top 50 features by frequency for each N-Gram order.
 
 ```{r plotWordNgrams-M, echo=F, fig.width=5.8, fig.height=3, message=FALSE, cache=T, dependson=c(-1), results='hide' ,out.extra='style="float:left"'}
 unigramPlotData <- plotNgrams(nGrams[[1]], type = "Unigrams", color = "steelblue", features = 50)
@@ -442,46 +449,11 @@ quadgramPlotData$boxPlot
 
 This analysis reveals the degree to which lexical density increases with each higher-order ngram.  The most frequent unigrams were comprised almost exclusively of function words.  The proportion of content words in the top n-gram features increases with each higher-order. The **key finding** of this analysis was that content increases with context.
 
-### Syntactic (POS) N-Gram Analysis
-```{r loadCleanPOSNGrams-M, echo=F, eval=T, message=F, warning=F, cache=T}
-nGrams <- loadNGrams(corpora$training$clean$nGrams$pos)
-```
-The training corpus comprised some `r nGrams[[1]]@Dim[2]` POS unigrams, `r nGrams[[2]]@Dim[2]` POS bigrams, and `r nGrams[[3]]@Dim[2]` POS trigrams. The following reveals the top features by frequency for each Ngram.
+Next, the lexical coverage of each training set is evaluated vis-a-vis the validation test sets.
 
-```{r plotPOSUnigrams-M, echo=F, fig.width=5.8, fig.height=3, message=FALSE, results='hide', cache=T, dependson=c(-1), ,out.extra='style="float:left"'}
-nGramPlotData <- plotNgrams(nGrams[[1]], type = "Unigrams", color = "steelblue", features = 40)
-nGramPlotData$boxPlot
-```
+### Training Set EDA
 
-```{r posUnigramCloud-M, echo=F, fig.width=3.6, fig.height=3, message=FALSE, results='hide', cache=T, dependson=c(-2), out.extra='style="float:left"'}
-textplot_wordcloud(nGrams[[1]], random.order = FALSE, rot.per = .25,
-                   colors = RColorBrewer::brewer.pal(8,"Dark2"))
-```
-`r figr("plotPOSUnigrams-M", TRUE, type="Figure")`: 40 Most frequent of $N$ = `r nGrams[[1]]@Dim[2]` unigrams
 
-```{r plotPOSBigrams-M, echo=F, fig.width=5.8, fig.height=3, message=FALSE, results='hide', cache=T, dependson=c(-3), out.extra='style="float:left"'}
-nGramPlotData <- plotNgrams(nGrams[[2]], type = "Bigrams", color = "orange", features = 50)
-nGramPlotData$boxPlot
-```
-
-```{r posBigramCloud-M, echo=F, fig.width=3.6, fig.height=3, message=FALSE, results='hide', cache=T, dependson=c(-4), out.extra='style="float:left"'}
-textplot_wordcloud(nGrams[[2]], random.order = FALSE, rot.per = .25,
-                   colors = RColorBrewer::brewer.pal(8,"Dark2"))
-```
-`r figr("plotPOSBigrams-M", TRUE, type="Figure")`: 50 Most frequent of $N$ = `r nGrams[[2]]@Dim[2]` bigrams
-
-```{r plotPOSTrigrams-M, echo=F, fig.width=5.8, fig.height=3, message=FALSE, results='hide', cache=T, dependson=c(-5), out.extra='style="float:left"'}
-nGramPlotData <- plotNgrams(nGrams[[3]], type = "Trigrams", color = "springgreen4", features = 50)
-nGramPlotData$boxPlot
-```
-
-```{r posTrigramCloud-M, echo=F, fig.width=3.6, fig.height=3, message=FALSE, results='hide', cache=T,  dependson=c(-6), out.extra='style="float:left"'}
-textplot_wordcloud(nGrams[[3]], random.order = FALSE, rot.per = .25,
-                   colors = RColorBrewer::brewer.pal(8,"Dark2"))
-```
-`r figr("plotPOSTrigrams-M", TRUE, type="Figure")`: 50 Most frequent of $N$ = `r nGrams[[3]]@Dim[2]` trigrams
-
-This analysis confirms some aspects of the lexical feature analysis, but goes further. The **key finding** of this analysis was that the bigram and trigram co occurrence information intimates the value of an integrated word and POS-based N-Gram model.  
 
 ### Exploratory Data Analysis (EDA) Summary
 Eight analyses were undertaken to reveal linguistic characteristics of the corpus that could be exploited during the language modeling phase.  The following summarizes the key findings from each analysis.
@@ -493,9 +465,18 @@ Eight analyses were undertaken to reveal linguistic characteristics of the corpu
 5. **Word N-Gram Frequency Distribution Analysis** - the distribution of n-grams did not model a "zipfian" distribution.
 6. **Word N-Gram Coverage Analysis** - any pruning from the higher-order n-grams would have a significant and detrimental affect on coverage, and prediction accuracy.
 7. **Word N-Gram Feature Analysis** - the increased lexical density of higher-order n-grams showed that content increases with context
-8. **Syntactic (POS) N-Gram Analysis** - the bigram and trigram co occurrence information intimates the value of an integrated word and POS-based N-Gram model.
 
-## Corpus Processing
+## Model Corpora 
+The model corpora included the training, validation, and test corpora. The validation and test sets would be allocated on 5% training corpus each. As `r figr("corporaDesign-M", TRUE, type="Table")`, the language model will be evaluated on training sets of 10%, 20%, 35% and 50% of the HC Corpus.
+
+`r figr("corporaDesign-M", TRUE, type="Table")`: The model corpora design. training sets are alpha thru delta.
+```{r corporaDesign-M, echo=F, message=FALSE,  eval=T, results='asis'}
+kable(trainingDesign$corporaDesign, digits = 0, format.args = list(big.mark = ','))
+```
+
+The next section summarizes the **exploratory data analysis** of the **delta** training set.
+
+### Corpus Processing
 Three corpus processing steps preceded the language modeling phase: OOV processing, sentence annotation, and n-gram creation. 
 
 **OOV Processing**

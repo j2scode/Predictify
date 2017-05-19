@@ -14,17 +14,17 @@ getData(raw, referenceFiles, directories, local=TRUE)
 ```
 
 ```{r reshapeData, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}
-parallelizeTask(reshapeData, raw, reshaped, registers)
+parallelizeTask(reshapeData, raw, reshaped)  
 ```
 
-```{r analyzeRawData, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}  
-rawDataAnalysis <- parallelizeTask(analyzeData, 'full', reshaped, registers, referenceFiles, directories, regexPatterns)
+```{r analyzeRawData, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}
+rawDataAnalysis <- parallelizeTask(analyzeData, 'full', reshaped, referenceFiles, directories, regexPatterns) 
 ```
 
-```{r cleanData, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-2), results='hide'}  
-parallelizeTask(cleanData, reshaped, clean, registers, referenceFiles, regexPatterns)
+```{r cleanData, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}  
+parallelizeTask(cleanData, reshaped, clean, referenceFiles, regexPatterns)    
 ```
 
 ```{r analyzeCleanData, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}  
-cleanDataAnalysis <- parallelizeTask(analyzeData, 'fast', clean, registers, referenceFiles, directories, regexPatterns)  
+cleanDataAnalysis <- parallelizeTask(analyzeData, 'fast', clean, referenceFiles, directories, regexPatterns)  
 ```

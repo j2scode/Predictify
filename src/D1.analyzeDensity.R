@@ -34,7 +34,7 @@ analyzeDensity <- function(posData, posTags, directories) {
     
     message('...calculating density')
     d <- list()
-    d$register <- posData[[p]]$category
+    d$register <- posData[[p]]$fileDesc
     d$tokens <- sum(ntoken(tokens))
     d$content <- sum(ntoken(contentWords))
     d$density <- d$content / d$tokens * 100

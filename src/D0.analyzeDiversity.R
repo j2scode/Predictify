@@ -126,14 +126,12 @@ measureDiversity <- function(register, growth) {
 #==============================================================================#
 #'  analyzeDiversity
 #' 
-#' This function takes as its parameters, the meta data for the corpus and 
-#' registers, the analysis, directories, regex and number of samples, then 
-#' returns a nested list containing eight data frames, one per 
-#' lexical measure, for each of the three registers. Each data frame contains 
-#' the data necessary to plot the measure using ggplot2
+#' This function analyzes lexical diversity according to eight measures of 
+#' lexical diversity.  It returns a nested list containing eight data frames, 
+#' one per  lexical measure, for each of the three registers. Each data 
+#' frame contains the data necessary to plot the measure using ggplot2
 #' 
 #' @param korpus - the meta data for the clean corpus
-#' @param registers - the meta data for the registers
 #' @param analysis - the corpus analysis
 #' @param directories - the directory structure
 #' @param regex - the regex patterns
@@ -142,7 +140,7 @@ measureDiversity <- function(register, growth) {
 #'                            data
 #' @author John James
 #' @export
-analyzeDiversity <- function(korpus, registers, analysis, directories, regex, 
+analyzeDiversity <- function(korpus, analysis, directories, regex, 
                              numSamples = 100) {
   
   startTime <- Sys.time()
@@ -151,31 +149,24 @@ analyzeDiversity <- function(korpus, registers, analysis, directories, regex,
   size <- rep(floor(min(analysis$featureMatrix$tokens[1:3]) / numSamples) * numSamples, 3)
   chunkSize <- floor(size / numSamples) 
   
-  # Format korpus meta data
-  korpus$documents <- lapply(seq_along(registers), function(r) {
-    d <- list()
-    d$directory <- file.path(korpus$directory, 'documents')
-    d$fileName <- registers[[r]]$fileName
-    d$fileDesc <- registers[[r]]$fileDesc
-    d
-  })
-
   # Conduct diversity analysis of each register  
   analysis <- lapply(seq_along(korpus$documents), function(d) {
+    
     message(paste('\n...loading', korpus$documents[[d]]$fileDesc))
     textData <- unlist(readFile(korpus$documents[[d]]))
+    
     message('......tokenizing data')
-    tokens <- unlist(quanteda::tokenize(textData, what = 'word'))[1:size[d]]
-    diversity <- list()
+    korpus$documents[[d]]$data <- unlist(quanteda::tokenize(textData, what = 'word'))[1:size[d]]
+    
     message('......creating growth object')
-    diversity$growth <- growth.fnc(tokens, size = chunkSize[d], nchunks = numSamples)
+    diversity <- list()
+    diversity$growth <- growth.fnc(korpus$documents[[d]]$data, size = chunkSize[d], nchunks = numSamples)
     diversity$measures <- 
       measureDiversity(korpus$documents[[d]]$fileDesc, 
                        diversity$growth)
     message('......creating zipf object')
     diversity$zipf <- 
-      createZipfObject(korpus$documents[[d]]$fileDesc, tokens, 
-                       diversity$growth, numSamples)
+      createZipfObject(korpus$documents[[d]], diversity$growth, numSamples)
     diversity
   })
   

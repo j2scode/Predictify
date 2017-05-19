@@ -1,0 +1,7 @@
+"0","raw <- corpora$raw"
+"0","reshaped <- corpora$reshaped"
+"0","clean <-corpora$clean"
+"0","pilot <- corpora$pilot"
+"0","training <- corpora$train"
+"0","validation <- corpora$validation"
+"0","test <- corpora$test"

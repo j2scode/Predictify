@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "## ---- explore_training\n\n#==============================================================================#\n#                         exploreTraining                                      #\n#==============================================================================#\n#'  exploreTraining\n#' \n#' This function creates the training set nGrams and checks the out of \n#' vocabulary (OOV) rates of a training corpora vis-a-vis a \"test corpus\".  \n#' Words in the test corpus not found in the training corpora are \"OOV\"\n#' \n#' @param training - the meta data for the training data \n#' @param validation - the meta data for the validation set\n#' @param directories - the project directory structure\n#' @return trainingSummary - list containing the nGram counts and the \n#'                 OOV rates for each training corpora\n#' @author John James\n#' @export\nexploreTraining <- function(training, validation, directories) {\n  \n  startTime <- Sys.time()\n  \n  message(paste(\"\\nVerify vocabulary coverage for training sets\", startTime))\n  coverage <- rbindlist(lapply(seq_along(training), function(t) {\n    verifyVocabulary(validation, training[[t]], directories)\n  }))\n  \n  # Save Results\n  output <- list()\n  output$directory <- directories$analysisDir\n  output$fileName  <- paste0(sub('\\\\..*', '', paste0('training-data-analysis')),\n                             format(Sys.time(),'_%Y%m%d_%H%M%S'), '.Rdata')\n  output$objName   <- 'trainingDataAnalysis'\n  output$data  <- coverage\n  saveObject(output)\n  \n  # Log and Return results\n  logR('verifyVocabulary', startTime, ' ', ' ')\n  \n  # Alert User\n  endTime <- Sys.time()\n  message(paste('Training Data Analysis Complete at', endTime))\n  message(paste('Elapsed time is', round(difftime(endTime, startTime,  units = 'auto'), 2)))\n\n  return(coverage)\n}\n## ---- end\n#coverage <- verifyVocabulary(testCorpus, )",
+    "created" : 1495117090641.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "242154624",
+    "id" : "4B767372",
+    "lastKnownWriteTime" : 1495117826,
+    "last_content_update" : 1495117826436,
+    "path" : "~/Data Science/Data Science Projects/PredictifyR-1.0/src/E1.exploreTraining.R",
+    "project_path" : "src/E1.exploreTraining.R",
+    "properties" : {
+    },
+    "relative_order" : 4,
+    "source_on_save" : true,
+    "source_window" : "",
+    "type" : "r_source"
+}

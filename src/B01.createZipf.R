@@ -8,23 +8,22 @@
 #' This function creates a zipf object given the growth object created in 
 #' createGrowthObjects
 #' 
-#' @param register - the register for the document
-#' @param document - the document for which the growth curves are calculated
+#' @param document - the document and meta data to be analyzed
 #' @param vgc - the vocabulary growth curve data 
 #' @param numSamples - the number of samples, default = 1000
 #' @param zipfObject - the zipf object for the register
 #' @author John James
 #' @export
-createZipfObject <- function(register, document, vgc, numSamples = 1000) {
+createZipfObject <- function(document, vgc, numSamples = 1000) {
   
-  message(paste('...preparing zipf object for', register))
+  message(paste('...preparing zipf object for', document$fileDesc))
   
   # Read document and extract words
-  nTokens <- length(document)
+  nTokens <- length(document$data)
   sampleSize <- floor(nTokens / numSamples)
   
   # Create frequency spectrum object and term frequency list
-  docSpc    <- text2spc.fnc(document)
+  docSpc    <- text2spc.fnc(document$data)
   docSpc$m  <- as.integer(docSpc$m)
   docSpc$Vm <- as.integer(docSpc$Vm)
   docTfl    <- spc2tfl(docSpc)
@@ -40,7 +39,7 @@ createZipfObject <- function(register, document, vgc, numSamples = 1000) {
   }
   
   # Prepare an interpolated vocabulary growth curve
-  docIntVgc <- zipfR::vgc.interp(docSpc, N, m.max=1)
+  docIntVgc <- zipfR::vgc.interp(docSpc, N, m.max=1, allow.extrapolation=TRUE)
 
   # Prepare extrapolated vocabulary growth curve
   docLnre <- lnre('zm', spc=docSpc, cost='chisq', method='Custom', exact = FALSE)
@@ -48,10 +47,10 @@ createZipfObject <- function(register, document, vgc, numSamples = 1000) {
   
   # Calculate goodness of fit
   g <- lnre.goodness.of.fit(docLnre, docSpc, n.estimated=0, m.max=15)
-  goodness <- data.frame(Register = register, X2 = g$X2, P = g$p)
+  goodness <- data.frame(Register = document$fileDesc, X2 = g$X2, P = g$p)
 
   zipfObject <- list(
-    category = register,
+    category = document$fileDesc,
     nTokens = nTokens,
     docTfl = docTfl,
     docSpc = docSpc,
@@ -69,31 +68,26 @@ createZipfObject <- function(register, document, vgc, numSamples = 1000) {
 #==============================================================================#
 #'  createZipf
 #' 
-#' This function takes as its parameters, the meta data for the corpus and the
-#' growth objects created in createGrowthObjects, and returns a zipf object
-#' that will be used for diversity and sample size analysis
+#' This function returns a zipf object that will be used for diversity 
+#' and sample size analysis
 #' 
 #' @param korpus - meta data for the corpus being analyzed
-#' @param registers - the meta data for the corpus registers
 #' @param vgc - the vocabulary growth curve data
 #' @param directories - the project directory structure
 #' @return zipfObjects - the zipf object used for analysis and plotting
 #' @author John James
 #' @export
-createZipf <- function(korpus, registers, vgc, directories) {
+createZipf <- function(korpus, vgc, directories) {
   
   startTime <- Sys.time()
   message(paste('\nCreating Zipf objects for', korpus$corpusName,
                 'at', startTime))  
   
-  filePath <- list()
-  filePath$directory <- korpus$directory
-  zipfObjects <- lapply(seq_along(registers), function (x) {
-    message(paste('...preparing', registers[[x]]$fileDesc))
-    filePath$fileName <- registers[[x]]$fileName
-    document <- tolower(readFile(filePath))
-    tokens <- unlist(quanteda::tokenize(document, what = "word"))
-    createZipfObject(registers[[x]]$fileDesc, tokens, vgc[[x]])
+  zipfObjects <- lapply(seq_along(korpus$documents), function (x) {
+    message(paste('...preparing', korpus$documents[[x]]$fileDesc))
+    document <- readFile(korpus$documents[[x]])
+    korpus$documents[[x]]$data <- unlist(quanteda::tokenize(document, what = "word"))
+    createZipfObject(korpus$documents[[x]], vgc[[x]])
   })
   
   # Save Analysis

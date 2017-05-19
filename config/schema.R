@@ -158,59 +158,6 @@ referenceFiles  = list(
   )
 ) # end of reference files
 
-
-# Corpora meta data 
-corpora = list(
-  raw = list(
-    corpusName  = 'Raw Corpus',
-    directory   = directories$rawCorpus,
-    source      = list(
-      url           = 'http://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip',
-      downloadPath  = 'data/download/HC-Corpus.zip',
-      zipPath       = "C:\\Users\\John\\Documents\\Data Science\\Data Science Projects\\PredictifyR\\data\\download\\HC-Corpus.zip",
-      unZipDir      = directories$rawCorpus,
-      unZipfiles    = c(file.path('final/en_US/en_US.blogs.txt'),
-                        file.path('final/en_US/en_US.news.txt'),
-                        file.path('final/en_US/en_US.twitter.txt')))
-  ), # end of raw
-  reshaped = list(
-    corpusName = 'Reshaped Data',
-    directory  = directories$reshapedCorpus,
-    fileName = 'reshaped-data',
-    objName = 'reshapedData'
-  ), # end of reshaped
-  clean = list(
-    corpusName = 'Clean Corpus',
-    directory  = directories$cleanCorpus,
-    fileName = 'clean-corpus',
-    objName = 'cleanCorpus'
-  ), # end of clean
-  pilot = list(
-    corpusName = 'Pilot Corpus',
-    directory  = directories$pilotCorpus,
-    fileName = 'pilot-corpus',
-    objName = 'pilotCorpus'
-  ),
-  training = list(
-    corpusName = 'Training Corpora',
-    directory  = directories$trainingCorpora,
-    fileName = 'training-corpora',
-    objName = 'trainingCorpora'
-  ),
-  validation = list(
-    corpusName = 'Validation Corpus',
-    directory  = directories$validationCorpus,
-    fileName = 'validation-set',
-    objName = 'validationSet'
-  ),
-  test = list(
-    corpusName = 'Test Corpus',
-    directory  = directories$testCorpus,
-    fileName = 'test-set',
-    objName = 'testSet'
-  )
-)# end of corpora
-
 registers <- list(
   blogs = list(
     fileDesc = 'Blogs Register',
@@ -229,23 +176,222 @@ registers <- list(
   )
 )
 
-docTypes <- list(
-  text = 'text',
-  pos = list(
-    tags = 'tags',
-    pairs = 'pairs'
+nGrams <- list(
+  unigrams = list(
+    fileDesc = 'Unigrams',
+    fileName = 'unigrams.Rdata',
+    objName = 'unigrams'
+  ),
+  bigrams = list(
+    fileDesc = 'Bigrams',
+    fileName = 'bigrams.Rdata',
+    objName = 'bigrams'
+  ),
+  trigrams = list(
+    fileDesc = 'Trigrams',
+    fileName = 'trigrams.Rdata',
+    objName = 'trigrams'
+  ),
+  quadgrams = list(
+    fileDesc = 'Quadgrams',
+    fileName = 'quadgrams.Rdata',
+    objName = 'quadgrams'
   )
 )
+
+
+# Corpora meta data 
+corpora = list(
+  raw = list(
+    corpusName  = 'Raw Corpus',
+    directory   = directories$rawCorpus,
+    source      = list(
+      url           = 'http://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip',
+      downloadPath  = 'data/download/HC-Corpus.zip',
+      zipPath       = "C:\\Users\\John\\Documents\\Data Science\\Data Science Projects\\PredictifyR\\data\\download\\HC-Corpus.zip",
+      unZipDir      = directories$rawCorpus,
+      unZipfiles    = c(file.path('final/en_US/en_US.blogs.txt'),
+                        file.path('final/en_US/en_US.news.txt'),
+                        file.path('final/en_US/en_US.twitter.txt'))),
+    documents = lapply(seq_along(registers), function(r) {
+      d <- list()
+      d$directory <- directories$rawCorpus
+      d$fileName <- registers[[r]]$fileName
+      d$fileDesc <- registers[[r]]$fileDesc
+      d$objName  <- registers[[r]]$objName
+      d
+    })
+  ), # end of raw
+  reshaped = list(
+    corpusName = 'Reshaped Data',
+    directory  = directories$reshapedCorpus,
+    fileName = 'reshaped-data',
+    objName = 'reshapedData',
+    documents = lapply(seq_along(registers), function(r) {
+      d <- list()
+      d$directory <- directories$reshapedCorpus
+      d$fileName <- registers[[r]]$fileName
+      d$fileDesc <- registers[[r]]$fileDesc
+      d$objName  <- registers[[r]]$objName
+      d
+    })
+  ), # end of reshaped
+  clean = list(
+    corpusName = 'Clean Corpus',
+    directory  = directories$cleanCorpus,
+    fileName = 'clean-corpus',
+    objName = 'cleanCorpus',
+    documents = lapply(seq_along(registers), function(r) {
+      d <- list()
+      d$directory <- directories$cleanCorpus
+      d$fileName <- registers[[r]]$fileName
+      d$fileDesc <- registers[[r]]$fileDesc
+      d$objName  <- registers[[r]]$objName
+      d
+    })
+  ), # end of clean
+  pilot = list(
+    corpusName = 'Pilot Corpus',
+    documents = lapply(seq_along(registers), function(r) {
+      d <- list()
+      d$directory <- file.path(directories$pilotCorpus, 'documents')
+      d$fileName <- registers[[r]]$fileName
+      d$fileDesc <- registers[[r]]$fileDesc
+      d$objName  <- registers[[r]]$objName
+      d
+    }),
+    pos = lapply(seq_along(registers), function(r) {
+      p <- list()
+      p$directory <- file.path(directories$pilotCorpus, 'pos')
+      p$fileName <- registers[[r]]$fileName
+      p$fileDesc <- registers[[r]]$fileDesc
+      p$objName  <- registers[[r]]$objName
+      p
+    }),
+    nGrams = lapply(seq_along(nGrams), function(n) {
+      nGram <- list()
+      nGram$directory <- file.path(directories$pilotCorpus, 'nGrams')
+      nGram$objName <- nGrams[[n]]$objName
+      nGram$fileName <- nGrams[[n]]$fileName
+      nGram$fileDesc <- nGrams[[n]]$fileDesc
+      nGram
+    })
+  ),
+  training = list(
+    alpha = list(
+      corpusName = 'Training Set Alpha',
+      directory = file.path(directories$trainingCorpora, 'alpha'),
+      documents = lapply(seq_along(registers), function(r) {
+        d <- list()
+        d$directory <- file.path(directories$trainingCorpora, 'alpha', 'documents')
+        d$fileName <- registers[[r]]$fileName
+        d$fileDesc <- registers[[r]]$fileDesc
+        d$objName  <- registers[[r]]$objName
+        d
+      }),
+      nGrams = lapply(seq_along(nGrams), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$trainingCorpora, 'alpha', 'nGrams')
+        nGram$objName <- nGrams[[n]]$objName
+        nGram$fileName <- nGrams[[n]]$fileName
+        nGram$fileDesc <- nGrams[[n]]$fileDesc
+        nGram
+      })
+    ),
+    beta = list(
+      corpusName = 'Training Set Beta',
+      directory = file.path(directories$trainingCorpora, 'beta'),
+      documents = lapply(seq_along(registers), function(r) {
+        d <- list()
+        d$directory <- file.path(directories$trainingCorpora, 'beta', 'documents')
+        d$fileName <- registers[[r]]$fileName
+        d$fileDesc <- registers[[r]]$fileDesc
+        d$objName  <- registers[[r]]$objName
+        d
+      }),
+      nGrams = lapply(seq_along(nGrams), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$trainingCorpora, 'beta', 'nGrams')
+        nGram$objName <- nGrams[[n]]$objName
+        nGram$fileName <- nGrams[[n]]$fileName
+        nGram$fileDesc <- nGrams[[n]]$fileDesc
+        nGram
+      })
+    ),
+    gamma = list(
+      corpusName = 'Training Set Gamma',
+      directory = file.path(directories$trainingCorpora, 'gamma'),
+      documents = lapply(seq_along(registers), function(r) {
+        d <- list()
+        d$directory <- file.path(directories$trainingCorpora, 'gamma', 'documents')
+        d$fileName <- registers[[r]]$fileName
+        d$fileDesc <- registers[[r]]$fileDesc
+        d$objName  <- registers[[r]]$objName
+        d
+      }),
+      nGrams = lapply(seq_along(nGrams), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$trainingCorpora, 'gamma', 'nGrams')
+        nGram$objName <- nGrams[[n]]$objName
+        nGram$fileName <- nGrams[[n]]$fileName
+        nGram$fileDesc <- nGrams[[n]]$fileDesc
+        nGram
+      })
+    ),
+    delta = list(
+      corpusName = 'Training Set Delta',
+      directory = file.path(directories$trainingCorpora, 'delta'),
+      documents = lapply(seq_along(registers), function(r) {
+        d <- list()
+        d$directory <- file.path(directories$trainingCorpora, 'delta', 'documents')
+        d$fileName <- registers[[r]]$fileName
+        d$fileDesc <- registers[[r]]$fileDesc
+        d$objName  <- registers[[r]]$objName
+        d
+      }),
+      nGrams = lapply(seq_along(nGrams), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$trainingCorpora, 'delta', 'nGrams')
+        nGram$objName <- nGrams[[n]]$objName
+        nGram$fileName <- nGrams[[n]]$fileName
+        nGram$fileDesc <- nGrams[[n]]$fileDesc
+        nGram
+      })
+    )
+  ),
+  validation = list(
+    corpusName = 'Validation Corpus',
+    directory  = directories$validationCorpus,
+    fileName = 'validation-set',
+    objName = 'validationSet',
+    documents = lapply(seq_along(registers), function(r) {
+      d <- list()
+      d$directory <- directories$validationCorpus
+      d$fileName <- registers[[r]]$fileName
+      d$fileDesc <- registers[[r]]$fileDesc
+      d$objName  <- registers[[r]]$objName
+      d
+    })
+  ),
+  test = list(
+    corpusName = 'Test Corpus',
+    directory  = directories$testCorpus,
+    fileName = 'test-set',
+    objName = 'testSet',
+    documents = lapply(seq_along(registers), function(r) {
+      d <- list()
+      d$directory <- directories$testCorpus
+      d$fileName <- registers[[r]]$fileName
+      d$fileDesc <- registers[[r]]$fileDesc
+      d$objName  <- registers[[r]]$objName
+      d
+    })
+  )
+)# end of corpora
 
 textPipeline <- list(
   clean = 'clean',
   preprocessed = 'preprocessed',
-  processed = 'processed',
-  nGrams = 'nGrams'
-)
-
-posPipeline <- list(
-  clean = 'clean',
   processed = 'processed',
   nGrams = 'nGrams'
 )

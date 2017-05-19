@@ -9,18 +9,16 @@
 #' featurevector containing various feature measures.
 #' 
 #' @param type - type of analysis 'full' or 'fast'
-#' @param korpus - the meta data for the corpus
-#' @param registers - the meta data for the corpus registers
-#' @param docId - the document sequence number (1=blog, 2=news, 3=twitter)
+#' @param document - the document content to be analyzed
 #' @param regex  - the regex patterns
 #' @param referenceData - abbreviations, contractions, emoticons, etc...
 #' @return analysis - a list containing a vector of feature measures 
 #'                    and a list of samples
 #' @author John James
 #' @export
-getFeatures <- function(type, korpus, registers, docId, regex, referenceData) {
+getFeatures <- function(type, document, regex, referenceData) {
   
-  message(paste("...analyzing", registers[[docId]]$fileDesc,
+  message(paste("...analyzing", document$fileDesc,
                 'at', Sys.time()))
   
   # Initialize inspection objects and key variables
@@ -29,14 +27,9 @@ getFeatures <- function(type, korpus, registers, docId, regex, referenceData) {
   featureTables  <- list()
   wordLengths    <- list()
   
-  
-  # Read Data
-  message('......loading the text')
-  document <- list()
-  document$directory <- korpus$directory
-  document$fileName <- registers[[docId]]$fileName
-  sents <- readFile(document)
-  tokens <- unlist(quanteda::tokenize(unlist(sents), what = 'word'))
+  # Tokenize document
+  message('......tokenize the document')
+  tokens <- unlist(quanteda::tokenize(unlist(document$data), what = 'word'))
   
   # Extract Words
   message("......extracting words")
@@ -48,9 +41,9 @@ getFeatures <- function(type, korpus, registers, docId, regex, referenceData) {
   #                     Extract Descriptive Statistics                        #        
   #===========================================================================#
   message("......extracting basic features")
-  featureVector$category   <- registers[[docId]]$fileDesc
+  featureVector$category   <- document$fileDesc
   featureVector$objectSize <- as.numeric(round((object.size(tokens) / 1000000), 1))
-  featureVector$sentences  <- length(sents)
+  featureVector$sentences  <- length(document$data)
   featureVector$tokens     <- length(tokens)
   featureVector$words      <- length(words)
   featureVector$wordTypes  <- length(unique(words))
@@ -100,7 +93,7 @@ getFeatures <- function(type, korpus, registers, docId, regex, referenceData) {
     featureTables$contractions  <- as.data.frame(table(featureSamples$contractions))
     featureTables$contractions <- featureTables$contractions[
       order(-featureTables$contractions$Freq),]
-    featureTables$contractions$category <- registers[[docId]]$fileDesc
+    featureTables$contractions$category <- document$fileDesc
     
     message("......extracting tokens containing abbreviations")
     featureSamples$abbreviations <- tokens[tokens %in% referenceData$abbreviations$key]
@@ -108,7 +101,7 @@ getFeatures <- function(type, korpus, registers, docId, regex, referenceData) {
     featureTables$abbreviations  <- as.data.frame(table(featureSamples$abbreviations))
     featureTables$abbreviations <- featureTables$abbreviations[
       order(-featureTables$abbreviations$Freq),]
-    featureTables$abbreviations$category  <- registers[[docId]]$fileDesc
+    featureTables$abbreviations$category  <- document$fileDesc
     
     message("......extracting tokens containing profanity")
     featureSamples$badWords <- tokens[tokens %in% referenceData$badWordsFile$key]
@@ -116,7 +109,7 @@ getFeatures <- function(type, korpus, registers, docId, regex, referenceData) {
     featureTables$badWords  <- as.data.frame(table(featureSamples$badWords))
     featureTables$badWords <- featureTables$badWords[
       order(-featureTables$badWords$Freq),]
-    featureTables$badWords$category  <- registers[[docId]]$fileDesc
+    featureTables$badWords$category  <- document$fileDesc
     
     message("......extracting tokens requiring normalization")
     featureSamples$corrections <- tokens[tokens %in% referenceData$corrections$key]
@@ -125,7 +118,7 @@ getFeatures <- function(type, korpus, registers, docId, regex, referenceData) {
     featureTables$corrections <- featureTables$corrections[
       order(-featureTables$corrections$Freq),]
     if (featureVector$corrections > 0) { 
-      featureTables$corrections$category  <- registers[[docId]]$fileDesc
+      featureTables$corrections$category  <- document$fileDesc
     }
   }  
   analysis <- list(featureVector  = featureVector,
@@ -133,7 +126,7 @@ getFeatures <- function(type, korpus, registers, docId, regex, referenceData) {
                    featureSamples = featureSamples,
                    wordLengths = wordLengths)
   
-  message(paste("...analysis for ", registers[[docId]]$fileDesc,
+  message(paste("...analysis for ", document$fileDesc,
                 'complete at', Sys.time()))
   return(analysis)
 }
@@ -143,19 +136,18 @@ getFeatures <- function(type, korpus, registers, docId, regex, referenceData) {
 #==============================================================================#
 #'  summarizeAnalysis
 #' 
-#' This function takes as its parameter, the korpus meta data, the featureMatrix
-#' feature samples and the regex patterns, then produces a list of corpus total 
-#' figures for the featureMatrix.
+#' This function takes as its parameter, the type of analysis to be conducted,
+#' the korpus meta data, the feature matrix and regex parameters, and provides
+#' descriptive statistics at the corpus level.
 #' 
 #' @param type - indicates type of analysis 'full', or 'fast'
-#' @param korpus - the corpus meta data
-#' @param registers - the meta data for the corpus registers
+#' @param korpus - the korpus and its meta data
 #' @param featureMatrix - the feature matrix for the 3 registers
 #' @param regex - the regex patterns
 #' @return totals - a data frame containing total feature counts for the corpus
 #' @author John James
 #' @export
-summarizeAnalysis <- function(type, korpus, registers, featureMatrix, 
+summarizeAnalysis <- function(type, korpus, featureMatrix, 
                               featureSamples, regex) {
   
   message("...summarizing corpus feature totals")
@@ -166,13 +158,9 @@ summarizeAnalysis <- function(type, korpus, registers, featureMatrix,
   wordLengths   <- list()
   
   # Obtain word types across the combined corpus
-  message("......reading combined tokenized corpus")
-  
-  sents <- unlist(lapply(seq_along(registers), function(x) {
-    document <- list()
-    document$directory <- korpus$directory
-    document$fileName <- registers[[x]]$fileName
-    readFile(document)
+  message("......combine and tokenizing corpus")
+  sents <- unlist(lapply(seq_along(korpus), function(d) {
+    korpus[[d]]$data
   }))
   tokens <- unlist(quanteda::tokenize(sents, what = 'word'))
   
@@ -264,16 +252,13 @@ summarizeAnalysis <- function(type, korpus, registers, featureMatrix,
 #==============================================================================#
 #'  analyzeData
 #' 
-#' This function takes as its parameter, meta data initiates a series of 
-#' vectorized calls to a function that analyzes each file and returns a list 
-#' of feature measures and feature samples.  The feature measures are combined 
-#' into a single data frame, summary corpus level feature measures are calculated 
-#' and the list, containing the feature measure data frame and the selected 
-#' samples is returned to the calling environment.
+#' This function takes as its parameters, the type of analysis (full or fast),
+#' the corpus and reference data meta data, the project directory structure
+#' and the regex paraemters.  It returns an analysis including descriptive
+#' statistics for the corpus.
 #' 
 #' @param type - 'full' analysis or 'fast' (abbreviated) analysis
-#' @param korpus - the meta data for the corpora to be analyzed
-#' @param registers - the meta data for the registers to be analyzed
+#' @param metaData - the meta data for the corpora to be analyzed
 #' @param reference - the meta data for the reference files which contain
 #'                    lists of profane words, abbreviations, emoticons
 #'                    and contractions.
@@ -283,18 +268,28 @@ summarizeAnalysis <- function(type, korpus, registers, featureMatrix,
 #'          measures, and a list of selected sample features from each document.
 #' @author John James
 #' @export
-analyzeData <- function(type, korpus, registers, reference, directories, regex) {
+analyzeData <- function(type, metaData, reference, directories, regex) {
   
   startTime <- Sys.time()
   
-  message(paste("\nConducting a Analysis of "), korpus$corpusName, " at ",  startTime)
+  message(paste("\nConducting a Analysis of "), metaData$corpusName, " at ",  startTime)
   
   # Load reference data and address regex patterns
   referenceData <- loadReferenceData(reference)
   
+  message('...loading corpus')
+  korpus <- lapply(seq_along(metaData$documents), function(d) {
+    k <- list()
+    k$directory <- metaData$documents[[d]]$directory
+    k$fileName <- metaData$documents[[d]]$fileName
+    k$fileDesc <- metaData$documents[[d]]$fileDesc
+    k$data <- readFile(metaData$documents[[d]])
+    k
+  })
+  
   # Inspect Individual Corpus Files
-  featureVectors <- lapply(seq_along(registers),function(x) {
-    getFeatures(type, korpus, registers, x, regex, referenceData)})
+  featureVectors <- lapply(seq_along(korpus),function(x) {
+    getFeatures(type, korpus[[x]], regex, referenceData)})
   
   # Combine vectors into feature matrix
   featureMatrix <- rbindlist(lapply(seq_along(featureVectors), function(x) {
@@ -313,15 +308,15 @@ analyzeData <- function(type, korpus, registers, reference, directories, regex) 
     featureVectors[[x]]$featureTables})
   
   # Get totals for corpus
-  totals <- summarizeAnalysis(type, korpus, registers, featureMatrix, featureSamples, regex)
+  totals <- summarizeAnalysis(type, korpus, featureMatrix, featureSamples, regex)
   featureMatrix <- rbind(featureMatrix, totals$featureVector)
   totalWordLengths <- totals$wordLengths
   totalFeatureTables <- totals$featureTables
   
   # Format Summary Data
-  metaData <- list(corpus = korpus$corpusName,
-                   objName = korpus$objName,
-                   fileName = korpus$fileName,
+  metaData <- list(corpus = metaData$corpusName,
+                   objName = metaData$objName,
+                   fileName = metaData$fileName,
                    analysisDate = Sys.time()) 
   
   analysis <- list(metaData = metaData,
@@ -335,7 +330,7 @@ analyzeData <- function(type, korpus, registers, reference, directories, regex) 
   output <- list()
   output$directory <- directories$analysisDir
   output$fileName  <- paste0(sub('\\..*', '', paste0(type, '-analysis-of-')),
-                             korpus$fileName, 
+                             metaData$fileName, 
                              format(Sys.time(),'_%Y%m%d_%H%M%S'), '.Rdata')
   output$objName   <- paste0('analysis', korpus$objName)
   output$data  <- analysis

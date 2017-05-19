@@ -54,29 +54,23 @@ createGrowthObject <- function(document, type = 'fast', samples = 1000) {
 #==============================================================================#
 #'  createVGC
 #' 
-#' This function takes as its parameter, the meta data for the corpus to be 
-#' analyzed and returns a list of vocabulary growth curve data, one for each 
-#' register
+#' This function produces vocabulary growth curve data for each register
+#' in the corpus.
 #' 
 #' @param korpus - the meta data for the korpus being analyzed
-#' @param registers - the meta data for the registers
 #' @param directories - the project directory structure
 #' @param type = c('fast', 'full)
 #' @return growth - list of growth objects
 #' @author John James
 #' @export
-createVGC <- function(korpus, registers, directories, type = 'fast') {
+createVGC <- function(korpus, directories, type = 'fast') {
   
   startTime <- Sys.time()
   message(paste('\nPreparing vocabulary growth curve data for', korpus$corpusName,
                 'at', startTime))  
 
-  document <- list()
-  document$directory <- korpus$directory
-  vgc <- lapply(seq_along(registers), function(x) {
-    document$fileName <- registers[[x]]$fileName
-    document$fileDesc <- registers[[x]]$fileDesc
-    createGrowthObject(document, type = type)
+  vgc <- lapply(seq_along(korpus$documents), function(x) {
+    createGrowthObject(korpus$documents[[x]], type = type)
   })
   
   

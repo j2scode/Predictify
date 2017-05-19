@@ -9,33 +9,26 @@
 #' 
 #' @param raw - meta data for the raw corpus
 #' @param reshaped - meta data for the reshaped corpus
-#' @param registers - meta data for the corpus registers
 #' @author John James
 #' @export
-reshapeData <- function(raw, reshaped, registers) {
+reshapeData <- function(raw, reshaped) {
   
   startTime <- Sys.time()
   
   message(paste("\nReshaping data at",  startTime))
   
   # Reshape into sentence tokenized data
-  lapply(seq_along(registers), function(x) {
+  lapply(seq_along(raw$documents), function(x) {
     
-    message(paste('...loading', registers[[x]]$fileDesc))
-    rawData <- list()
-    rawData$directory <- raw$directory
-    rawData$fileName <- registers[[x]]$fileName
-    document <- readFile(rawData)
+    message(paste('...loading', raw$documents[[x]]$fileName))
+    document <- readFile(raw$documents[[x]])
     
-    message(paste('...reshaping', registers[[x]]$fileDesc))
+    message(paste('...reshaping', raw$documents[[x]]$fileName))
     korpus <- parallelizeTask(quanteda::corpus, document)
     sents <- parallelizeTask(quanteda::tokenize, korpus, what = 'sentence')
     
-    reshapedData <- list()
-    reshapedData$directory <- reshaped$directory
-    reshapedData$fileName <- registers[[x]]$fileName
-    reshapedData$data <- unlist(sents)
-    saveFile(reshapedData)
+    reshaped$documents[[x]]$data <- unlist(sents)
+    saveFile(reshaped$documents[[x]])
   })
   
   # Log Results

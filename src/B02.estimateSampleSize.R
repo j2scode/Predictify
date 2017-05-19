@@ -89,17 +89,15 @@ trainLNRE <- function(modelNum, sampleDocSpc) {
 #------------------------------------------------------------------------------#
 #'  estimateSampleSize 
 #' 
-#' This function takes as its parameter, the zipf objectd, extended SPC object 
-#' and the project directory, and creates a data frame that relates coverage to 
-#' sample size.
+#' This function uses LNRE models from the zipfR package to calculate and
+#' evaluate various samples sizes and associated OOV Rates.
 #' 
 #' @param korpus - the meta data for the HC Corpus
-#' @param registers - the meta data for the corpus registers
 #' @param directories - the project directory structure
 #' @return estimate - list of data frames containing coverage estimates 
 #' @author John James
 #' @export
-estimateSampleSize <- function(korpus, registers, directories) {
+estimateSampleSize <- function(korpus, directories) {
   
   startTime <- Sys.time()
   message(paste('\nEstimating vocabulary-based Sample size', startTime))
@@ -108,17 +106,14 @@ estimateSampleSize <- function(korpus, registers, directories) {
   sampleSizes <- c(.1,.5,1,3,5,10,15)
 
   # Iterate through registers, samples sizes, and coverages 
-  filePath <- list()
-  filePath$directory <- korpus$directory
-  coverage <- rbindlist(lapply(seq_along(registers), function(d) {
-    message(paste('...loading', registers[[d]]$fileDesc))
-    filePath$fileName <- registers[[d]]$fileName
-    document <- readFile(filePath)
+  coverage <- rbindlist(lapply(seq_along(korpus$documents), function(d) {
+    message(paste('...loading', korpus$documents[[d]]$fileDesc))
+    document <- readFile(korpus$documents[[d]])
     
-    message(paste('...tokenizing', registers[[d]]$fileDesc))
+    message(paste('...tokenizing', korpus$documents[[d]]$fileDesc))
     tokens <- unlist(tokenize(document, what = 'word'))
     
-    message(paste('...creating spectrum object for', registers[[d]]$fileDesc))
+    message(paste('...creating spectrum object for', korpus$documents[[d]]$fileDesc))
     hcDocSpc  <- text2spc.fnc(tokens)
     hcDocSpc$m  <- as.integer(hcDocSpc$m)
     hcDocSpc$Vm <- as.integer(hcDocSpc$Vm)
@@ -172,7 +167,7 @@ estimateSampleSize <- function(korpus, registers, directories) {
       
       # Format output
       result <- list()
-      result$register <- registers[[d]]$fileDesc
+      result$register <- korpus$documents[[d]]$fileDesc
       result$percent  <- sampleSizes[s]
       result$size     <- numSamples
       result$vSample <- vSample
@@ -219,9 +214,9 @@ estimateSampleSize <- function(korpus, registers, directories) {
   output <- list()
   output$directory <- directories$analysisDir
   output$fileName  <- paste0(sub('\\..*', '', paste0('')),
-                             'lexical-diversity-based-sample-size-estimate',
+                             'sample-size-estimate',
                             format(Sys.time(),'_%Y%m%d_%H%M%S'), '.Rdata')
-  output$objName   <- 'vocabularySampleSizeEstimate'
+  output$objName   <- 'sampleSizeEstimate'
   output$data  <- estimates
   saveObject(output)
   

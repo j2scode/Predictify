@@ -9,16 +9,15 @@
 #' files and the regex patterns, then saves the cleaned version of the file in 
 #' the designated cleaned file directory.
 #' 
-#' @param rawDocument <- meta data for raw data file
-#' @param register - the register name being processed
+#' @param rawDocument - the meta data and content for the file to be analyzed
 #' @param regex <- regex patterns
 #' @param badWords <- list of profane words
 #' @param corrections <- the corrections file
 #' @author John James
 #' @export
-cleanFile <- function(rawDocument, register, regex, badWords, corrections) {
+cleanFile <- function(rawDocument,regex, badWords, corrections) {
   
-  message(paste("\n...Cleaning", register, "at", Sys.time()))
+  message(paste("\n...Cleaning document at", Sys.time()))
   
   message('......lower casing')
   rawDocument <- tolower(rawDocument)
@@ -113,16 +112,15 @@ cleanFile <- function(rawDocument, register, regex, badWords, corrections) {
 #' This function cleans the raw corpus data and stores it in the designated 
 #' directory
 #' 
-#' @param rawCorpus - the meta data for the raw corpus
+#' @param reshapedCorpus - the meta data for the reshaped raw corpus
 #' @param cleanCorpus - the meta data for the clean corpus
-#' @param registers - the meta data for the registers
 #' @param reference - the meta data for the reference data which includes
 #'                    abbreviations, contractions, profane words, & emoticons
 #' @param regex  - regex patterns
 #' @return dateCleaned - the current system time.
 #' @author John James
 #' @export
-cleanData <- function(rawCorpus, cleanCorpus, registers, reference, regex) {
+cleanData <- function(reshapedCorpus, cleanCorpus, reference, regex) {
   
   startTime <- Sys.time()
   message(paste("\nCleaning Raw Corpus at"), startTime)
@@ -131,22 +129,16 @@ cleanData <- function(rawCorpus, cleanCorpus, registers, reference, regex) {
   badWords <- readFile(reference$badWordsFile)
   corrections <- readFile(reference$corrections)
   
-  message('...loading corpus documents')
-  filePath <- list()
-  filePath$directory <- rawCorpus$directory
-  rawData <- lapply(seq_along(registers), function(r) {
-    filePath$fileName <- registers[[r]]$fileName
-    readFile(filePath)
+  message('...loading corpus')
+  korpus <- lapply(seq_along(reshapedCorpus$documents), function(d) {
+    readFile(reshapedCorpus$documents[[d]])
   })
   
   # Cleaning File
-  cleanData  <- list()
-  cleanData$directory <- clean$directory
-  lapply(seq_along(rawData), function(x) {
-    message(paste('...cleaning', registers[[x]]$fileDesc))
-    cleanData$fileName <- registers[[x]]$fileName
-    cleanData$data <- cleanFile(rawData[[x]], registers[[x]]$fileDesc, regex, badWords, corrections)
-    saveFile(cleanData)
+  lapply(seq_along(korpus), function(x) {
+    message(paste('...cleaning', reshaped$documents[[x]]$fileDesc))
+    cleanCorpus$documents[[x]]$data <- cleanFile(korpus[[x]], regex, badWords, corrections)
+    saveFile(cleanCorpus$documents[[x]])
   })
   
   # Log

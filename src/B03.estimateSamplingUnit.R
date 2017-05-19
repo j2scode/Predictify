@@ -4,22 +4,19 @@
 #------------------------------------------------------------------------------#
 #'  estimateSamplingUnit 
 #' 
-#' This function takes the meta data for the corpus to be sampled, 
-#' the meta data for the registers, the posTags,
-#' and the directory structure and compares the distributions of lexical features 
+#' This function compares the distributions of lexical features 
 #' across pairs of samples of varying sizes. The results of chi-squared tests 
 #' for selected features are averaged over the samples.  The function returns 
 #' a data frame indicating average chi-squared p-values for each feature and 
 #' sampling unit size.
 #' 
 #' @param korpus - the meta data for the corpus
-#' @param registers - the meta data for the registers
 #' @param posTags - selected POS tags
 #' @param directories - the project directory structure
 #' @return analysis - the sampling unit size analysis.
 #' @author John James
 #' @export
-estimateSamplingUnit <- function(korpus, registers, posTags, directories) {
+estimateSamplingUnit <- function(korpus, posTags, directories) {
   
   startTime <- Sys.time()
   
@@ -32,14 +29,11 @@ estimateSamplingUnit <- function(korpus, registers, posTags, directories) {
   # Designate POS Tags to include in study
   posTags <- subset(posTags, Study == TRUE)
   
-  filePath <- list()
-  filePath$directory <- korpus$directory
   analysis <- lapply(seq_along(sampleSizes), function(s) {
     message(paste('...processing', sampleSizes[s], 'token samples'))
-    scores <- rbindlist(lapply(seq_along(registers), function(x) {
-      message(paste('......processing', registers[[x]]$fileDesc))
-      filePath$fileName <- registers[[x]]$fileName
-      document <- tolower(readFile(filePath))
+    scores <- rbindlist(lapply(seq_along(korpus$documents), function(x) {
+      message(paste('......processing', korpus$documents[[x]]$fileDesc))
+      document <- readFile(korpus$documents[[x]])
       tokens <- unlist(quanteda::tokenize(document, what = "word"))
       midway <- floor(length(tokens)/2)
       

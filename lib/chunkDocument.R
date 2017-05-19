@@ -9,11 +9,11 @@
 #' and returns the document in a list of chunks of equal size.
 #' 
 #' @param document - the document to be sampled
-#' @param chunkSize - the number of tokens per chunk
+#' @param chunkSize - the number of sentences per chunk
 #' @return chunks - list of chunks of equal number of sentences
 #' @author John James
 #' @export
-chunkDocument <- function(document, chunkSize = 100) {
+chunkDocument <- function(document, chunkSize) {
   
   # Validate inputs
   docLength <-length(document)

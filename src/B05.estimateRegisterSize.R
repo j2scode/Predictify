@@ -4,14 +4,11 @@
 #------------------------------------------------------------------------------#
 #'  estimateRegisterSize 
 #' 
-#' This function takes the meta data for the corpus, the meta data for the 
-#' corpus registers. the corpus size estimate,
-#' the posTags and the  directory structure and provides an estimate of 
-#' register size for eAch register based upon the distribution of lexical 
-#' features per n000-word samples of the text.
+#' This function provides an estimate of  register size for each register 
+#' based upon the distribution of lexical  features per 2000-word 
+#' samples of the text.
 #' 
 #' @param korpus - the meta data for the corpus
-#' @param registers - the meta data for the registers
 #' @param corpusSize - the corpus sizes estimate
 #' @param samplingUnit - sampling unit analysis
 #' @param posTags - selected POS tags
@@ -19,7 +16,7 @@
 #' @return corpusSize - the corpus size estimate with summary tables
 #' @author John James
 #' @export
-estimateRegisterSize <- function(korpus, registers, corpusSize, 
+estimateRegisterSize <- function(korpus, corpusSize, 
                                  samplingUnit, posTags, directories) {
   
   startTime <- Sys.time()
@@ -32,12 +29,9 @@ estimateRegisterSize <- function(korpus, registers, corpusSize,
   posTags <- subset(posTags, Study == TRUE)
   
   # Conduct POS analysis on each register 
-  filePath <- list()
-  filePath$directory <- korpus$directory
-  posAnalysis <- lapply(seq_along(registers), function(x) {
-    message(paste('...loading', registers[[x]]$fileDesc))
-    filePath$fileName <- registers[[x]]$fileName
-    document <- readFile(filePath)
+  posAnalysis <- lapply(seq_along(korpus$documents), function(x) {
+    message(paste('...loading', korpus$documents[[x]]$fileDesc))
+    document <- readFile(korpus$documents[[x]])
     
     message('...converting document to word tokens')
     document <- unlist(quanteda::tokenize(document, what = 'word'))
