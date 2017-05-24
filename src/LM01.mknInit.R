@@ -42,7 +42,7 @@ mknInit <- function(mkn, nGrams, regex) {
   })
 
   # Log Results
-  logR(mkn$args$mName, startTime, mkn$args$counts[[1]]$directory, 'various')
+  logR(mkn$args$mName, startTime, mkn$args$directory, 'various')
   
   # Alert User
   endTime <- Sys.time()

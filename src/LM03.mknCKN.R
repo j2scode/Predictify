@@ -12,9 +12,10 @@
 #' the current ngram.                      
 #' 
 #' @param mkn - the meta data for the MKN language model
+#' @param N - order of the NGRAM model
 #' @author John James
 #' @export
-mknCKN <- function(mkn) {
+mknCKN <- function(mkn, N) {
   
   startTime <- Sys.time()
   
@@ -26,7 +27,7 @@ mknCKN <- function(mkn) {
   lapply(seq_along(model), function(x) {
     message(paste('...calculating continuation counts for', 
                   mkn$args$counts[[x]]$fileDesc))
-    if (x < 4) {
+    if (x < N) {
       # Extract current and higher nGram counts
       current <- model[[x]]
       higher  <- model[[x+1]][,.(suffix, count)]

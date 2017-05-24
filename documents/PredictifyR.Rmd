@@ -40,10 +40,7 @@ source('./config/initEnvironment.R')
 ```{r child = 'D.0-pipeline-explore.Rmd'}  
 ```
 
-```{r child = 'E.0-pipeline-process.Rmd'}  
-```
-
-```{r child = 'F.0-pipeline-model.Rmd'}  
+```{r child = 'E.0-pipeline-model.Rmd'}  
 ```
 
 

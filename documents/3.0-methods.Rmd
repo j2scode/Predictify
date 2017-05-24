@@ -444,19 +444,43 @@ This analysis reveals the degree to which lexical density increases with each hi
 Next, the lexical coverage of each training set is evaluated vis-a-vis the validation test sets.
 
 ### Training Sets EDA
+The primary inquiry for the training sets was the degree to which the training sets covered the validation and test set nGrams.  The following tables summarize the unigram, bigram, trigram, and quadgram coverages for training sets alpha thru delta.
 
+`r figr("alphaCoverage-M", TRUE, type="Table")`: nGram Coverage for Training Set Alpha
+```{r alphaCoverage-M, echo=F, eval=T, message=F, warning=F, cache=F}
+coverageTable <- plotTrainingCoverage(coverageTrainingAlpha)
+kable(coverageTable, digits = 2, format.args = list(big.mark = ','))
+```
 
+`r figr("betaCoverage-M", TRUE, type="Table")`: nGram Coverage for Training Set Beta
+```{r betaCoverage-M, echo=F, eval=T, message=F, warning=F, cache=F}
+coverageTable <- plotTrainingCoverage(coverageTrainingBeta)
+kable(coverageTable, digits = 2, format.args = list(big.mark = ','))
+```
+
+`r figr("gammaCoverage-M", TRUE, type="Table")`: nGram Coverage for Training Set Gamma
+```{r gammaCoverage-M, echo=F, eval=T, message=F, warning=F, cache=F}
+coverageTable <- plotTrainingCoverage(coverageTrainingGamma)
+kable(coverageTable, digits = 2, format.args = list(big.mark = ','))
+```
+
+`r figr("deltaCoverage-M", TRUE, type="Table")`: nGram Coverage for Training Set Delta
+```{r deltaCoverage-M, echo=F, eval=T, message=F, warning=F, cache=F}
+coverageTable <- plotTrainingCoverage(coverageTrainingDelta)
+kable(coverageTable, digits = 2, format.args = list(big.mark = ','))
+```
 
 ### Exploratory Data Analysis (EDA) Summary
-Eight analyses were undertaken to reveal linguistic characteristics of the corpus that could be exploited during the language modeling phase.  The following summarizes the key findings from each analysis.
+Eight analyses were undertaken to reveal linguistic characteristics of the pilot and training set corpora that could be exploited during the language modeling phase.  The following summarizes the key findings from each analysis.
 
-1. **Descriptive Statistics** - outlined the basics in terms of numbers of sentences, words and word types. 
-2. **Lexical Diversity Analysis** - confirmed that the greater the lexical diversity of a register, the greater the sampling proportion required to be representative. 
-3. **Lexical Density Analysis** - the seemingly low lexical density estimates called into question the value of an integrated semantic prediction model.
-4. **Lexical Feature Analysis** - the range and distribution of lexical features across registers, was a positive indication for an integrated word and POS-based N-Gram prediction model.
-5. **Word N-Gram Frequency Distribution Analysis** - the distribution of n-grams did not model a "zipfian" distribution.
-6. **Word N-Gram Coverage Analysis** - any pruning from the higher-order n-grams would have a significant and detrimental affect on coverage, and prediction accuracy.
-7. **Word N-Gram Feature Analysis** - the increased lexical density of higher-order n-grams showed that content increases with context
+1. **Pilot Corpus Descriptive Statistics** - outlined the basics in terms of numbers of sentences, words and word types for the pilot corpus. 
+2. **Pilot Corpus Lexical Diversity Analysis** - confirmed that the greater the lexical diversity of a register, the greater the sampling proportion required to be representative. 
+3. **Pilot Corpus Lexical Density Analysis** - the seemingly low lexical density estimates called into question the value of an integrated semantic prediction model.
+4. **Pilot Corpus Lexical Feature Analysis** - the range and distribution of lexical features across registers, was a positive indication for an integrated word and POS-based N-Gram prediction model.
+5. **Pilot Corpus Word N-Gram Frequency Distribution Analysis** - the distribution of n-grams did not model a "zipfian" distribution.
+6. **Pilot Corpus Word N-Gram Coverage Analysis** - any pruning from the higher-order n-grams would have a significant and detrimental affect on coverage, and prediction accuracy.
+7. **Pilot Corpus Word N-Gram Feature Analysis** - the increased lexical density of higher-order n-grams showed that content increases with context
+8. **Training Set nGram Coverage Analysis** - validation and test set nGram coverage increases significantly with training set size
 
 ### Corpus Processing
 Three corpus processing steps preceded the language modeling phase: OOV processing, sentence annotation, and n-gram creation. 

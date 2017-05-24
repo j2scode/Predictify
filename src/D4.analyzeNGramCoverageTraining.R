@@ -5,21 +5,23 @@
 #==============================================================================#
 #'  analyzeNGramCoverageTraining
 #' 
-#' This function compares the training and validation ngrams, calculating
-#' the degree to which the validation ngrams are covered in the training 
-#' data.  The analysis is conducted over the series of four training sets
+#' This function compares provides coverage analysis of the training ngrams
+#' vis-a-vis the validation and test nGrams. It calculates the degree to which 
+#' the validation and test ngrams are covered in the training  data.  
 #' 
 #' @param training - the meta data for the training data set
 #' @param validation - the meta data for the validation set
+#' @param test - the meta data for the validation set
 #' @param directories - the project directory structure
-#' @return trainingSummary - list containing the nGram counts and the 
-#'                 OOV rates for each training corpora
+#' @return coverage - list containing the nGram counts and the 
+#'                 OOV rates for each training corpora, vis-a-vis validation
+#'                 and test data
 #' @author John James
 #' @export
-analyzeNGramCoverageTraining <- function(training, validation, directories) {
+analyzeNGramCoverageTraining <- function(training, validation, test, directories) {
   
   startTime <- Sys.time()
-  message(paste('\n...Analyzing', training$corpusName, 'NGram Coverage at', startTime))
+  message(paste('\nAnalyzing', training$corpusName, 'NGram Coverage at', startTime))
   
   message(paste('...loading', training$corpusName))
   trainingData <- unlist(lapply(seq_along(training$documents), function(d) {
@@ -30,42 +32,66 @@ analyzeNGramCoverageTraining <- function(training, validation, directories) {
   valData <- unlist(lapply(seq_along(validation$documents), function(d) {
     readFile(validation$documents[[d]])
   }))
+
+  message(paste('...loading', test$corpusName))
+  testData <- unlist(lapply(seq_along(test$documents), function(d) {
+    readFile(test$documents[[d]])
+  }))
   
-  coverage <- rbindlist(lapply(seq_along(training$nGrams), function(n) {
+  coverage <- rbindlist(lapply(seq_along(training$nGrams$words), function(n) {
     
     gc()
   
-    message(paste('......tokenizing', training$corpusName, 
-                  training$nGrams[[n]]$fileDesc))
-    trainingNGrams <- quanteda::tokenize(trainingData, what = 'word', ngrams = n)
+    message(paste('\n......tokenizing', training$corpusName, 
+                  training$nGrams$words[[n]]$fileDesc))
+    trainingNGrams <- unlist(quanteda::tokenize(trainingData, 
+                                                what = 'word', ngrams = n,
+                                                concatenator = ' '))
 
     message(paste('......tokenizing Validation Set', 
-                  training$nGrams[[n]]$fileDesc))
-    validationNGrams <- quanteda::tokenize(valData, what = 'word', ngrams = n)
+                  training$nGrams$words[[n]]$fileDesc))
+    validationNGrams <- unlist(quanteda::tokenize(valData, what = 'word',
+                                                  ngrams = n,
+                                                  concatenator = ' '))
+    
+    message(paste('......tokenizing Test Set', 
+                  training$nGrams$words[[n]]$fileDesc))
+    testNGrams <- unlist(quanteda::tokenize(testData, what = 'word', 
+                                            ngrams = n,
+                                            concatenator = ' '))
     
     message('......extracting vocabularies')
-    validationV <- unique(validationNGrams)
     trainingV <- unique(trainingNGrams)
-    
+    validationV <- unique(validationNGrams)
+    testV <- unique(testNGrams)
+
     message('......calculating VOOV')
-    vOOV <- length(validationV) - sum(validationV %in% trainingV)
+    valVoov <- length(validationV) - sum(validationV %in% trainingV)
+    testVoov <- length(testV) - sum(testV %in% trainingV)
     
     message('......calculating NOOV')
-    nOOV <- length(validationNGrams) - sum(validationNGrams %in% trainingNGrams)
+    valNoov <- length(validationNGrams) - sum(validationNGrams %in% trainingNGrams)
+    testNoov <- length(testNGrams) - sum(testNGrams %in% trainingNGrams)
     
     message('......summarizing results')
     oovData <- list()
-    oovData$tSet  <- training$corpusName
-    oovData$vTraining <- length(trainingV)
-    oovData$nTraining <- length(trainingNGrams)
-    oovData$vValidation <- length(validationV)
-    oovData$nValidation <- length(validationNGrams)
-    oovData$nValidation <- length(trainingNGrams)
-    oovData$vOOV <- vOOV
-    oovData$nOOV <- nOOV
-    oovData$vOOVRate <- vOOV / oovData$vValidation
-    oovData$nOOVRate <- nOOV / oovData$nValidation
-    oovData$coverage <- (1 - oovData$nOOVRate) * 100
+    oovData$tset  <- training$corpusName
+    oovData$sents <- length(trainingData)
+    oovData$words <- sum(ntoken(trainingData))
+    oovData$nGram <- training$nGrams$words[[n]]$fileDesc
+    oovData$trainingNGramTypes <- length(trainingV)
+    oovData$trainingNGrams <- length(trainingNGrams)
+    
+    oovData$valNGrams <- length(validationNGrams)
+    oovData$valnGramsOOV <- valNoov
+    oovData$valNGramsOOVRate <- valNoov / oovData$valNGrams
+    oovData$valCoverage <- (1 - oovData$valNGramsOOVRate) * 100
+
+    oovData$testNGrams <- length(testNGrams)
+    oovData$testnGramsOOV <- testNoov
+    oovData$testNGramsOOVRate <- testNoov / oovData$testNGrams
+    oovData$testCoverage <- (1 - oovData$testNGramsOOVRate) * 100
+    
     oovData
   }))  
 

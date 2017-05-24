@@ -1,4 +1,0 @@
-"0","validationNGrams <- parallelizeTask(nGramCorpus, validation, directories)  
-"
-"2","Error in detectCores() : could not find function ""detectCores""
-"

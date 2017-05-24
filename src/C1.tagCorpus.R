@@ -19,9 +19,12 @@ tagCorpus <- function(korpus) {
   lapply(seq_along(korpus$documents), function(r) {
     korpus$documents[[r]]$data <- unlist(readFile(korpus$documents[[r]]))
     posData <- tagDocument(korpus$documents[[r]])
-    korpus$pos[[r]]$data <- unlist(posData$tags)
     
-    saveFile(korpus$pos[[r]])
+    # Saving POS Data
+    korpus$pos$tags[[r]]$data <- unlist(posData$tags)
+    korpus$pos$pairs[[r]]$data <- unlist(posData$pairs)
+    saveFile(korpus$pos$tags[[r]])
+    saveFile(korpus$pos$pairs[[r]])
   })
   
   

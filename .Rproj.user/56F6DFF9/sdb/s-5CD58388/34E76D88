@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "```{r mkn4Alpha, echo=F, eval=T, message=F, warning=F, cache=T, results='hide'}     \nmkn4Alpha <- mknPipeline(training$alpha, validation, lm$mkn4, coverageTrainingAlpha, regexPatterns, directories)\n```\n\n```{r mkn4Beta, echo=F, eval=T, message=F, warning=F, cache=T, results='hide'}     \nmkn4Beta <- mknPipeline(training$beta, validation, lm$mkn4, coverageTrainingBeta, regexPatterns, directories)\n```\n\n```{r mkn4Gamma, echo=F, eval=T, message=F, warning=F, cache=T, results='hide'}     \nmkn4Gamma <- mknPipeline(training$gamma, validation, lm$mkn4, coverageTrainingGamma, regexPatterns, directories)\n```\n\n```{r mkn4Delta, echo=F, eval=T, message=F, warning=F, cache=T, results='hide'}     \nmkn4Delta <- mknPipeline(training$alpha, validation, lm$mkn4, coverageTrainingDelta, regexPatterns, directories)\n```\n",
+    "created" : 1495296652612.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4186331495",
+    "id" : "34E76D88",
+    "lastKnownWriteTime" : 1495600042,
+    "last_content_update" : 1495600042161,
+    "path" : "~/Data Science/Data Science Projects/PredictifyR-1.0/documents/./E.0-pipeline-model.Rmd",
+    "project_path" : "documents/./E.0-pipeline-model.Rmd",
+    "properties" : {
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

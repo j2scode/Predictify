@@ -84,7 +84,7 @@ createZipf <- function(korpus, vgc, directories) {
     document <- readFile(korpus$documents[[x]])
     tokens <- unlist(quanteda::tokenize(document, what = "word", 
                                         removeNumbers = TRUE, 
-                                        removePunct = TRUE, 
+                                        remove_punct = TRUE, 
                                         removeSymbols = TRUE, 
                                         removeTwitter = TRUE, 
                                         removeHyphens = FALSE,

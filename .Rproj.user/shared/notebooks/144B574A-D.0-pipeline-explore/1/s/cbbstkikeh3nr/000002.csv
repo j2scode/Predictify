@@ -1,0 +1,8 @@
+"0","coverageSummary <- list("
+"0","  alpha <- coverageTrainingAlpha,"
+"0","  beta <- coverageTrainingBeta,"
+"0","  gamma <- coverageTrainingGamma,"
+"0","  delta <- coverageTrainingDelta"
+"0",")"
+"2","Error: object 'coverageTrainingAlpha' not found
+"

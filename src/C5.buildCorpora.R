@@ -18,7 +18,7 @@
 #' @author John James
 #' @export
 buildCorpora <- function(design, hcCorpus, training, 
-                      validation, test) {
+                         validation, test) {
   
   startTime <- Sys.time()
   message(paste('\nBuilding Model Corpora at', startTime))
@@ -32,7 +32,7 @@ buildCorpora <- function(design, hcCorpus, training,
     document <- readFile(hcCorpus$documents[[d]])
     chunkDocument(document, design$pilot$`Sentences per Chunk`[d])
   })
-
+  
   #---------------------------------------------------------------------------#
   #                 Build Training, Validation and Test Sets                  #
   #---------------------------------------------------------------------------#
@@ -44,7 +44,7 @@ buildCorpora <- function(design, hcCorpus, training,
     message('...creating validation set')
     pool <- 1:length(korpus[[r]])
     chunks <- design$corpusDesign$Validation[r] / 
-              design$pilot$`Sentences per Chunk`[r]
+      design$pilot$`Sentences per Chunk`[r]
     set.seed(0505)
     valIndices <- sample(pool, chunks)
     validation$documents[[r]]$data <- unlist(korpus[[r]][valIndices])
@@ -71,25 +71,6 @@ buildCorpora <- function(design, hcCorpus, training,
     })
   }) 
 
-  #---------------------------------------------------------------------------#
-  #                     Build nGrams for Training Sets                        #
-  #---------------------------------------------------------------------------#
-  message(paste("\nCreating nGrams for training sets", startTime))
-  nGrams <- rbindlist(lapply(seq_along(training), function(t) {
-    message(paste('...processing', training[[t]]$corpusName))
-    nGramCorpus(training[[t]], directories)
-  }))
-  
-  
-  # Save Results
-  output <- list()
-  output$directory <- directories$analysisDir
-  output$fileName  <- paste0(sub('\\..*', '', paste0('training-nGrams')),
-                             format(Sys.time(),'_%Y%m%d_%H%M%S'), '.Rdata')
-  output$objName   <- 'trainingNGrams'
-  output$data  <- nGrams
-  saveObject(output)
-  
   # Log Results
   logR('buildCorpora', startTime, '', '')
   

@@ -23,7 +23,7 @@ processTrainingNGrams <- function(metaData, nGrams, source = 'preprocessed') {
     document <- readFile(metaData)
     nGramData <- lapply(seq_along(nGrams), function(x) {
       message(paste('...creating', nGrams[[x]]$fileDesc))
-      nGrams[[x]]$data <- dfm(document, ngrams = x, removePunct = FALSE, 
+      nGrams[[x]]$data <- dfm(document, ngrams = x, remove_punct = FALSE, 
                               concatenator = ' ', tolower = FALSE)
       saveObject(nGrams[[x]])
     })
@@ -31,7 +31,7 @@ processTrainingNGrams <- function(metaData, nGrams, source = 'preprocessed') {
     nGramData <- lapply(seq_along(metaData), function(x) {
       message(paste('...creating', nGrams[[x]]$fileDesc))
       document <- readFile(metaData[[x]])
-      nGrams[[x]]$data <- dfm(document, ngrams = x, removePunct = FALSE, 
+      nGrams[[x]]$data <- dfm(document, ngrams = x, remove_punct = FALSE, 
                               concatenator = ' ', tolower = FALSE)
       saveObject(nGrams[[x]])
     })

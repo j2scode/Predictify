@@ -23,7 +23,7 @@ createGrowthObject <- function(document, samples = 1000) {
   # Read data and create document frequency matrix
   textData <- readFile(document)
   tokens <- unlist(quanteda::tokenize(textData, what = "word", removeNumbers = TRUE, 
-                                      removePunct = TRUE, removeSymbols = TRUE, 
+                                      remove_punct = TRUE, removeSymbols = TRUE, 
                                       removeTwitter = TRUE, removeHyphens = FALSE,
                                       removeURL = TRUE))
   # Initialize VGC vectors an data

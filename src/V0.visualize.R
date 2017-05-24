@@ -633,3 +633,26 @@ plotNGramCoverage <- function(coverage, type, color) {
 }
 ## ---- end
 
+#------------------------------------------------------------------------------#
+#                                plotTrainingCoverage                          #
+#------------------------------------------------------------------------------#
+#'  plotTrainingCoverage 
+#' 
+#' This function renders a table containing nGram coverage of the training set
+#' vis-a-vis the validation and test sets 
+#' 
+#' @param coverage - the nGram coverage data for the training set
+#' @return coverageTable - the table summarizing coverages by nGram
+#' @author John James
+#' @export
+plotTrainingCoverage <- function(coverage) {
+  
+  coverageTable <- coverage[,c(1,4:14)]
+  names(coverageTable) <- c('Training Set', 'nGram', 'Training nGram Types',
+                            'Training nGrams', 'Validation Set nGrams', 
+                            'Validation OOV', 'Validation OOV Rate',
+                            'Validation Coverage', 'Test Set nGrams',
+                            'Test OOV', 'Test OOV Rate', 'Test Coverage')
+                        
+  return(coverageTable)
+}

@@ -11,9 +11,10 @@
 #' order model. The normalizing factor is added to the model.
 #' 
 #' @param mkn - the meta data for the MKN language model
+#' @param N - nGram order
 #' @author John James
 #' @export
-mknNorm <- function(mkn) {
+mknNorm <- function(mkn, N) {
   
   startTime <- Sys.time()
   
@@ -31,7 +32,7 @@ mknNorm <- function(mkn) {
     message(paste('...calculating normalizing factors for', 
                   mkn$args$counts[[x]]$fileDesc))
     # Compute normalizing factor
-    if (x < 4) {
+    if (x < N) {
       norm <- rep(summary[x+1,2]$Count, nrow(current))
       current <- current[, norm := norm]
     } else {

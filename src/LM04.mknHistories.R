@@ -10,9 +10,10 @@
 #' histories in which the nGram appears once, twice and 3 or more times.
 #' 
 #' @param mkn - the meta data for the MKN language model
+#' @param N - the order of the nGram model
 #' @author John James
 #' @export
-mknHistories <- function(mkn) {
+mknHistories <- function(mkn, N) {
   
   startTime <- Sys.time()
   
@@ -23,7 +24,7 @@ mknHistories <- function(mkn) {
   })
 
   lapply(seq_along(model), function(x) {
-    if (x < 4) {
+    if (x < N) {
       message(paste('...counting number of histories for', 
                     mkn$args$counts[[x]]$fileDesc))
       

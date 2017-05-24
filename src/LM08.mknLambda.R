@@ -9,9 +9,10 @@
 #' calculates the scaling factor lambda for lower order model
 #' 
 #' @param mkn - the meta data for the MKN language model
+#' @param N - the ngram order
 #' @author John James
 #' @export
-mknLambda <- function(mkn) {
+mknLambda <- function(mkn, N) {
   
   startTime <- Sys.time()
   

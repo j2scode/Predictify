@@ -1,0 +1,15 @@
+```{r mkn4Alpha, echo=F, eval=T, message=F, warning=F, cache=T, results='hide'}     
+mkn4Alpha <- mknPipeline(training$alpha, validation, lm$mkn4, coverageTrainingAlpha, regexPatterns, directories)
+```
+
+```{r mkn4Beta, echo=F, eval=T, message=F, warning=F, cache=T, results='hide'}     
+mkn4Beta <- mknPipeline(training$beta, validation, lm$mkn4, coverageTrainingBeta, regexPatterns, directories)
+```
+
+```{r mkn4Gamma, echo=F, eval=T, message=F, warning=F, cache=T, results='hide'}     
+mkn4Gamma <- mknPipeline(training$gamma, validation, lm$mkn4, coverageTrainingGamma, regexPatterns, directories)
+```
+
+```{r mkn4Delta, echo=F, eval=T, message=F, warning=F, cache=T, results='hide'}     
+mkn4Delta <- mknPipeline(training$alpha, validation, lm$mkn4, coverageTrainingDelta, regexPatterns, directories)
+```

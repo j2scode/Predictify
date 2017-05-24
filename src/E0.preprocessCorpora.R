@@ -5,17 +5,15 @@
 #==============================================================================#
 #'  oovTagDocument
 #' 
-#' This function takes as its parameter, document to be tagged, its meta data
-#' and the oov vocabulary and tags the OOV words with UNK, then saves the 
-#' document to disc.
-#' 
-#' 
+#' This function tags the OOV words with UNK, then returns the document to the 
+#' calling environment.
+#'  
 #' @param document - the document to be tagged
-#' @param outKorpus - the meta data for the oov tagged (preprocessed) document
 #' @param oov - the oov vocabulary to be replaced with UNK
+#' @return document - returns the document once tagged
 #' @author John James
 #' @export
-oovTagDocument <- function(document, outKorpus, oov) {
+oovTagDocument <- function(document, oov) {
   
   # Tag document OOV words
   document <- unlist(lapply(seq_along(document), function(x) {
@@ -29,9 +27,7 @@ oovTagDocument <- function(document, outKorpus, oov) {
     sent
   }))
   
-  # Save Document
-  outKorpus$document$data <- document
-  saveFile(outKorpus$document)
+  return(document)
 }
   
 
@@ -40,27 +36,25 @@ oovTagDocument <- function(document, outKorpus, oov) {
 #==============================================================================#
 #'  oovTestSets
 #' 
-#' This function takes as its parameter, the meta data for the test (or 
-#' validation) set and the training set vocabulary. It reads the test set and 
-#' replaces all words in the test corpus that are not in the training set 
-#' with UNK.  Finally, it saves the file to disc.
+#' This function reads the test set and  replaces all words in the test set 
+#' that are not in the training set with UNK.  Finally, it saves the file to 
+#' the appropriate processed subdirectory.  
 #' 
 #' 
-#' @param inKorpus - the meta data for the input (clean) corpus
-#' @param outKorpus - the meta dat for the output (preprocessed) corpus
+#' @param test - the meta data for the test corpus (either validation or test)
 #' @param vTraining - the training set vocabulary
 #' @return summary - list containing summary of words, oov and oov rates and
 #'                   the vocabulary
 #' @author John James
 #' @export
-oovTestSets <- function(inKorpus, outKorpus, vTraining) {
+oovTestSets <- function(test, vTraining) {
   
-  message(paste('...processing OOV for', inKorpus$corpusName))
+  message(paste('...processing OOV for', test$corpusName))
   
   # Read document
   message('......loading document')
-  document <- unlist(lapply(seq_along(inKorpus$documents), function(d) {
-    unlist(readFile(inKorpus$documents[[d]]))
+  document <- unlist(lapply(seq_along(test$documents), function(d) {
+    unlist(readFile(test$documents[[d]]))
   }))
   
   # Get vocabulary and token statistics
@@ -78,16 +72,17 @@ oovTestSets <- function(inKorpus, outKorpus, vTraining) {
   names(oovWords) <- rep('UNK', length(oovWords)) 
   message(paste('......extracted', length(oovWords), 'OOV Words'))
   
-  # Tag Document
-  oovTagDocument(document, outKorpus, oovWords)
+  # Tag and save document
+  test$processed$words[[1]]$data <- oovTagDocument(document, oovWords)
+  saveFile(test$processed$words[[1]])
   
   # Summarize Statistics 
   oov <- length(oovWords)
-  summary <- data.frame(corpus = outKorpus$corpusName,
+  summary <- data.frame(corpus = test$corpusName,
                         V = V, N = N, oov = oov, oovrate = oov / N)
   names(summary) <- c('Corpus', 'Vocabulary','Tokens' ,'OOV', 'OOV Rate')
   
-  message(paste('...processing OOV for', outKorpus$corpusName, 'complete'))
+  message(paste('...processing OOV for', test$corpusName, 'complete'))
   
   return(summary)
   
@@ -104,19 +99,18 @@ oovTestSets <- function(inKorpus, outKorpus, vTraining) {
 #' set vocabulary to the calling environment.
 #' 
 #' 
-#' @param inKorpus - the meta data for input (clean) corpus
-#' @param outKorpus - the meta data for the output (preprocessed) corpus
+#' @param training - the meta data for training set
 #' @return summary - list containing summary of words, oov and oov rates and
 #'                   the vocabulary
 #' @author John James
 #' @export
-oovTrainingSet <- function(inKorpus, outKorpus) {
+oovTrainingSet <- function(training) {
   
-  message(paste('...processing OOV for', inKorpus$corpusName))
+  message(paste('...processing OOV for', training$corpusName))
   
   message('......loading document')
-  document <- unlist(lapply(seq_along(inKorpus$documents), function(d) {
-    unlist(readFile(inKorpus$documents[[d]]))
+  document <- unlist(lapply(seq_along(training$documents), function(d) {
+    unlist(readFile(training$documents[[d]]))
   }))
 
   # Get vocabulary and token statistics
@@ -138,13 +132,14 @@ oovTrainingSet <- function(inKorpus, outKorpus) {
   names(hapaxLegomena) <- rep('UNK', length(hapaxLegomena))
   message(paste('......extracted', length(hapaxLegomena), 'hapax legomena'))
  
-  # Tag document
-  oovTagDocument(document, outKorpus, hapaxLegomena) 
+  # Tag and save document
+  training$processed$words[[1]]$data <- oovTagDocument(document, hapaxLegomena) 
+  saveFile(training$processed$words[[1]])
 
   # Summarize Statistics 
   oov <- length(hapaxLegomena)
   oovRate <- oov / N
-  summary <- data.frame(corpus = outKorpus$corpusName,
+  summary <- data.frame(corpus = training$corpusName,
                         V = V, N = N, oov = oov, oovRate = oovRate)
   names(summary) <- c('Corpus', 'Vocabulary','Tokens' ,'OOV', 'OOV Rate')
   
@@ -153,7 +148,7 @@ oovTrainingSet <- function(inKorpus, outKorpus) {
     summary = summary,
     vocabulary = vocabulary)
   
-  message(paste('...processing OOV for', inKorpus$corpusName, 'complete'))
+  message(paste('...processing OOV for', training$corpusName, 'complete'))
   return(res)
 }
   
@@ -164,41 +159,23 @@ oovTrainingSet <- function(inKorpus, outKorpus) {
 #==============================================================================#
 #'  oovCorpora
 #' 
-#' This function takes the corpora meta data as its parameter and processes
-#' the training, validation and test sets for OOV words. For the training set
-#' all hepax legomena will be replaced with "UNK", the unkown word pseudo tag.
-#' For the validation and test sets all words not in the training set will 
+#' This function processes the training and test set for OOV words. For the 
+#' training set all hepax legomena will be replaced with "UNK", the unkown 
+#' pseudo tag. For the test set all words not in the training set will 
 #' be similarly replaced with the an unknown pseudo-word.
 #' 
-#' @param korpora - the meta data for the project corpora
+#' @param training - the meta data for the training set 
+#' @param test - the meta data for the test set
 #' @return summary - summary of words, oov and oov rates for each corpus
 #' @author John James
 #' @export
-oovCorpora <- function(korpora) {
+oovCorpora <- function(training, test) {
     
-  message(paste("...processing OOV for Corpora"))
-  
-  # Define input and output corpora
-  inKorpora <- list(
-    training = korpora$train$clean,
-    validation = korpora$validation$clean,
-    test = korpora$test$clean
-  )
-  
-  outKorpora <- list(
-    training = korpora$training$preprocessed,
-    validation = korpora$validation$preprocessed,
-    test = korpora$test$preprocessed
-  )
-  
   # Performing OOV processing
-  trainSummary <- oovTrainingSet(inKorpora$training, outKorpora$training)
-  valSummary <- oovTestSets(inKorpora$validation, outKorpora$validation, 
-                            trainSummary$vocabulary)
-  testSummary <- oovTestSets(inKorpora$test, outKorpora$test, 
-                             trainSummary$vocabulary)
+  trainSummary <- oovTrainingSet(training)
+  testSummary <- oovTestSets(test, trainSummary$vocabulary)
   
-  summary <- rbind(trainSummary$summary, valSummary, testSummary)
+  summary <- rbind(trainSummary$summary, testSummary)
   
   return(summary)
 }
@@ -208,38 +185,35 @@ oovCorpora <- function(korpora) {
 #==============================================================================#
 #'  preprocessCorpora
 #' 
-#' This function takes the corpora meta data as its parameter and preprocesses
-#' the word and POS-based ngram data. The word based data in the training,
-#' validation and test sets are treated for OOV words.  The POS based training
-#' data, currently stored at the register level, are combined into a single
-#' documents including the POS tagged sentences and the POS/Word pairs. 
+#' This function preprocesses the word and POS-based ngram data. The word based 
+#' data includes the training set, validation and test sets. The preprocessing 
+#' for the word data includes the  following:
+#'   1. Mark all hapax legomena in the training set as an unknown word with
+#'      the 'UNK' pseudo token and save in the first slot in the processed
+#'      words subdirectory of the training set.
+#'   2. Mark all words in the test and validation sets that are not in the 
+#'      training set as an unknown word, with the 'UNK' pseudo token and save in 
+#'      the appropriate processed subdirectory.
+#'      
+#' The POS data will be combined into a single file and stored in the first
+#' slot of the processed pos subdirectory of the training set. The POS Word
+#' pairs will similarly be combined into a single file and stored in the 
+#' processed pos word pairs directory
 #' 
-#' @param korpora - the meta data for the project corpora
+#' 
+#' @param training - the meta data for the training set
+#' @param test - the meta data for the test set (validation or test set)
+#' @param directories - the project directory structure
 #' @return summary - summary of words, oov and oov rates for each corpus
 #' @author John James
 #' @export
-preprocessCorpora <- function(korpora, directories) {
+preprocessCorpora <- function(training, validation, directories) {
   
   startTime <- Sys.time()
   
-  message(paste("\nPreprocessing Corpora at", startTime))
+  message(paste("\nPreprocessing", training$corpusName, 'at', startTime))
   
-  oov <- oovCorpora(korpora)
-  
-  message('...preprocessing POS tag training data')
-  document <- unlist(lapply(seq_along(korpora$training$clean$pos), function(d) {
-    readFile(korpora$training$clean$pos[[d]])
-  }))
-  korpora$training$preprocessed$pos$data <- document
-  saveFile(korpora$training$preprocessed$pos)
-  
-  message('...preprocessing POS/Word pair training data')
-  document <- unlist(lapply(seq_along(korpora$training$clean$pairs), function(d) {
-    readFile(korpora$training$clean$pairs[[d]])
-  }))
-  korpora$training$preprocessed$pairs$data <- document
-  saveFile(korpora$training$preprocessed$pairs)
-  
+  oov <- oovCorpora(training, test)
   
   # Save Results
   output <- list()

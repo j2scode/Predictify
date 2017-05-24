@@ -8,56 +8,36 @@
 #' This function prepares the document feature matrices used for language 
 #' modeling
 #' 
-#' @param processed - the meta data for the processed word and POS data
-#' @param nGrams - the meta data for the  nGrams
+#' @param korpus - the meta data for the processed word and POS data
 #' @param directories - the project directory structure
 #' @return nGramSummary - data frame with counts for each n-gram (and type)
 #' @author John James
 #' @export
-createNGrams <- function(processed, nGrams, directories) {
+createNGrams <- function(korpus, directories) {
   
   startTime <- Sys.time()
-  
-  message(paste("\nPreparing nGrams at", startTime))
-  
-  message('...preparing WORD-based nGrams')
-  nGramSummary <- rbindlist(lapply(seq_along(processed$text), function(x) {
-    message(paste('......creating nGrams for', processed$text[[x]]$fileDesc))
-    document <- readFile(processed$text[[x]])
-    nGrams$text[[x]]$data <- dfm(document, ngrams = x, removePunct = FALSE, 
+  message(paste("\nPreparing nGrams for", korpus$corpusName, 'at', startTime))
+
+  nGramSummary <- rbindlist(lapply(seq_along(korpus$processed$words), function(x) {
+    message(paste('...creating', korpus$processed$words[[x]]$fileDesc))
+    document <- readFile(korpus$processed$words[[x]])
+    korpus$nGrams$words[[x]]$data <- dfm(document, ngrams = x, remove_punct = FALSE, 
                                  concatenator = ' ', tolower = FALSE)
-    saveObject(nGrams$text[[x]])
+    saveObject(korpus$nGrams$words[[x]])
     s <- list()
-    s$Type  <- 'Word'
-    s$nGram <- nGrams$text[[x]]$fileDesc
-    s$Count <- nfeature((nGrams$text[[x]]$data))
+    s$Corpus <- korpus$corpusName
+    s$nGram <- korpus$nGrams$words[[x]]$fileDesc
+    s$Features <- nfeature(korpus$nGrams$words[[x]]$data)
     s
   }))
   
-  if ('training' == strsplit(processed$pos$unigram$fileName, '-')[[1]][2]) {
-    message('...preparing POS-based nGrams')
-    posNGramSummary <- rbindlist(lapply(seq_along(processed$pos), function(x) {
-      message(paste('......creating nGrams for', processed$pos[[x]]$fileDesc))
-      document <- readFile(processed$pos[[x]])
-      nGrams$pos[[x]]$data <- dfm(document, ngrams = x, removePunct = FALSE, 
-                                   concatenator = ' ', tolower = FALSE)
-      saveObject(nGrams$pos[[x]])
-      s <- list()
-      s$Type <- 'POS'
-      s$nGram <- nGrams$pos[[x]]$fileDesc
-      s$Count <- nfeature((nGrams$pos[[x]]$data))
-      s
-    }))
-    nGramSummary <- rbind(nGramSummary, posNGramSummary)
-  }
-
   # Save Analysis
   output <- list()
   output$directory <- directories$analysisDir
-  output$fileName  <- paste0(sub('\\..*', '', paste0('')),
-                             'create-nGrams', 
+  output$fileName  <- paste0(sub('\\..*', '', paste0('create-nGrams-')),
+                             korpus$fileName, 
                              format(Sys.time(),'_%Y%m%d_%H%M%S'), '.Rdata')
-  output$objName   <- 'nGramSummary'
+  output$objName   <- paste0('nGramSummary', korpus$objName)
   output$data  <- nGramSummary
   saveObject(output)
   
