@@ -47,8 +47,10 @@ buildCorpora <- function(design, hcCorpus, training,
       design$pilot$`Sentences per Chunk`[r]
     set.seed(0505)
     valIndices <- sample(pool, chunks)
-    validation$documents[[r]]$data <- unlist(korpus[[r]][valIndices])
-    saveFile(validation$documents[[r]])
+    lapply(seq_along(validation), function(t) {
+      validation[[t]]$documents[[r]]$data <- unlist(korpus[[r]][valIndices])
+      saveFile(validation[[t]]$documents[[r]])
+    })
     
     message('...creating test set')
     pool <- pool[!pool %in% valIndices]
@@ -56,8 +58,10 @@ buildCorpora <- function(design, hcCorpus, training,
               design$pilot$`Sentences per Chunk`[r]
     set.seed(0505)
     testIndices <- sample(pool, chunks)
-    test$documents[[r]]$data <- unlist(korpus[[r]][testIndices])
-    saveFile(test$documents[[r]])
+    lapply(seq_along(test), function(t) {
+      test[[t]]$documents[[r]]$data <- unlist(korpus[[r]][testIndices])
+      saveFile(test[[t]]$documents[[r]])
+    })
     
     message('...creating training sets')
     pool <- pool[!pool %in% testIndices]

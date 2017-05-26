@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "## ---- mkn_lambda\n\n#==============================================================================#\n#                               mknLambda                                      #\n#==============================================================================#\n#'  mknLambda\n#' \n#' This function takes as its parameter, the meta data for mkn model and \n#' calculates the scaling factor lambda for lower order model\n#' \n#' @param mkn - the meta data for the MKN language model\n#' @param N - the ngram order\n#' @author John James\n#' @export\nmknLambda <- function(mkn, N) {\n  \n  startTime <- Sys.time()\n  memory.limit(20000)\n  \n  message(paste('\\nCalculating scaling factor lambda at', startTime))\n  \n  message('...loading nGram counts and discounts')\n  model <- lapply(seq_along(mkn$counts), function(x) {\n    loadObject(mkn$counts[[x]])\n  })\n  discounts <- loadObject(mkn$discounts)\n\n  lapply(seq_along(model), function(x) {\n    if (x < N) {\n      message(paste('...calculating scaling factor lambda for', \n                    mkn$counts[[x]]$fileDesc))\n      #Obtain Model\n      current <- model[[x]]\n\n      # Extract discounts   \n      D1 <- discounts[x+1,4]$D1\n      D2 <- discounts[x+1,5]$D2\n      D3 <- discounts[x+1,6]$D3\n      \n      # Calculate DnNn for context and add to lower level N-gram\n      D <- current[,.(nGram, n1wdot, n2wdot, n3pwdot)]\n      D <- D[, D1N1 := D1 * n1wdot]\n      D <- D[, D2N2 := D2 * n2wdot]\n      D <- D[, D3N3 := D3 * n3pwdot]\n      D <- D[, DnNn := D1N1 + D2N2 + D3N3] \n      D <- D[, c('n1wdot', 'n2wdot', 'n3pwdot') := NULL]\n      current <- merge(current, D, by = 'nGram')\n      \n      # Compute lambda\n      current <- current[, lambda := DnNn / norm]\n\n      # Save  counts\n      mkn$counts[[x]]$data <- current\n      saveObject(mkn$counts[[x]])\n      \n    }\n  })\n  \n  # Log Results\n  logR('MKN Lambda Counts', startTime, mkn$counts[[1]]$directory,' ')\n  \n  # Alert User\n  endTime <- Sys.time()\n  message(paste0('MKN Lambda Calculated at ', endTime))\n  message(paste('Elapsed time is', round(difftime(endTime, startTime,  units = 'auto'), 2)))\n  \n}\n## ---- end\n#mknAdjustedCounts(lm$mkn)",
+    "created" : 1495802434948.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3678979261",
+    "id" : "2F64600",
+    "lastKnownWriteTime" : 1495805574,
+    "last_content_update" : 1495805574544,
+    "path" : "~/Data Science/Data Science Projects/PredictifyR-1.0/src/LM08.mknLambda.R",
+    "project_path" : "src/LM08.mknLambda.R",
+    "properties" : {
+    },
+    "relative_order" : 7,
+    "source_on_save" : true,
+    "source_window" : "",
+    "type" : "r_source"
+}

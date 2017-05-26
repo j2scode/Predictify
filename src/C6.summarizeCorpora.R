@@ -24,8 +24,8 @@ summarizeCorpora <- function(training, validation, test, directories) {
     beta <- training$beta,
     gamma <- training $gamma,
     delta <- training$delta,
-    validation <- validation,
-    test <- test
+    validation <- validation$alpha,
+    test <- test$alpha
   )
   
   corporaSummary <- rbindlist(lapply(seq_along(corpora), function(c) {

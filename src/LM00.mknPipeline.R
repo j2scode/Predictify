@@ -12,70 +12,59 @@
 #' @param training - the meta data for the training set being modeled
 #' @param test - the meta data for the test set 
 #' @param model - the meta data for the model
-#' @param analysis - the training set coverage analyses
 #' @param regex - the regex patterns
 #' @param directories - the project directory structure
 #' @author John James
 #' @export
-mknPipeline <- function(training, test, model, analysis, regex, directories) {
+mknPipeline <- function(training, test, model, regex, directories) {
   
   startTime <- Sys.time()
-  message(paste('\nExecuting', model$args$mDesc, 'on',
+  message(paste('\nExecuting', model$mDesc, 'on',
                 training$corpusName, 'at', startTime))
   
   gc()
   
-  # Preorocess OOV     
-  oov <- parallelizeTask(preprocessCorpora, training, test, directories)  
-  
-  # Process text, creating sentence boundary tokens for nGram order 1-4
-  parallelizeTask(processCorpus, training)
-  parallelizeTask(processCorpus, test)
-  
-  # Create nGrams
-  nGrams <- parallelizeTask(createNGrams, training, directories)
-  
   # Initialize MKN language model
-  mknInit(model, training$nGrams$words, regex)
+  mknInit(model, training$nGrams, regex)
   
   # Create absolute counts of each nGram
-  features <- parallelizeTask(mknAbsCount, model, training$nGrams$words)
+  features <- parallelizeTask(mknAbsCount, model, training$nGrams)
   
   # Create continuation counts of each nGram
-  parallelizeTask(mknCKN, model, model$args$mOrder)
+  parallelizeTask(mknCKN, model, model$mOrder)
   
   # Count nGram histories
-  parallelizeTask(mknHistories, model, model$args$mOrder)
+  parallelizeTask(mknHistories, model, model$mOrder)
   
   # Calculate discounts
   discounts <- mknDiscount(model)
   
   # Update models with normalizing factors
-  parallelizeTask(mknNorm, model, model$args$mOrder)
+  parallelizeTask(mknNorm, model, model$mOrder)
   
   # Calculate pseudo probability alpha
   parallelizeTask(mknAlpha, model)
   
   # Compute weighting factor lambda
-  parallelizeTask(mknLambda, model, model$args$mOrder)
+  parallelizeTask(mknLambda, model, model$mOrder)
   
   # Evaluate Model on Validation Set
-  evaluation <- parallelizeTask(mknEstimate, model, 
-                                training$processed$words[[4]], 
-                                test$processed$words[[model$args$mOrder]],
+  evaluation <- mknEstimate(model,training$processed[[model$mOrder]],
+                                test$processed[[model$mOrder]],
                                 sents = 1000, directories)
   
   # Format evaluation package
   evalPackage <- list()
+  evalPackage$model = model$mDesc
+  evalPackage$corpus = training$corpusName
   evalPackage$pct = training$pct
-  evalPackage$training = analysis
   evalPackage$eval = evaluation
-  
+
   # Save Analysis
   output <- list()
   output$directory <- directories$analysisDir
-  output$fileName  <- paste0(sub('\\..*', '', paste0('')),
-                             paste0('MKN-analysis-package-',training$pct,'-pct'),
+  output$fileName  <- paste0(sub('\\..*', '', paste0('MKN-analysis-package-')),
+                             training$fileName,
                              format(Sys.time(),'_%Y%m%d_%H%M%S'), '.Rdata')
   output$objName   <- 'evalPackage'
   output$data  <- evalPackage

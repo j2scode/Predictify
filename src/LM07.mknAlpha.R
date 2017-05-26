@@ -10,7 +10,6 @@
 #' probabilities of each nGram without interpolation. 
 #' 
 #' @param mkn - the model meta data 
-#' @param discounts - the meta data for the modified Kneser-Ney Discounts
 #' @author John James
 #' @export
 mknAlpha <- function(mkn) {
@@ -20,14 +19,14 @@ mknAlpha <- function(mkn) {
   message(paste('\nCalculation pseudo probabilities alpha ', startTime))
   
   message('...loading models and discounts')
-  model <- lapply(seq_along(mkn$args$counts), function(x) {
-    loadObject(mkn$args$counts[[x]])
+  model <- lapply(seq_along(mkn$counts), function(x) {
+    loadObject(mkn$counts[[x]])
   })
-  discounts <- loadObject(mkn$args$discounts)
+  discounts <- loadObject(mkn$discounts)
 
-  model <- lapply(seq_along(model), function(x) {
+  lapply(seq_along(model), function(x) {
     message(paste('...calculating alpha probabilities for', 
-                  mkn$args$counts[[x]]$fileDesc))
+                  mkn$counts[[x]]$fileDesc))
     
     current <- model[[x]]
     
@@ -43,8 +42,8 @@ mknAlpha <- function(mkn) {
       current[, alpha := alphaCount / norm]
     }
     # Save  counts
-    mkn$args$counts[[x]]$data <- current
-    saveObject(mkn$args$counts[[x]])
+    mkn$counts[[x]]$data <- current
+    saveObject(mkn$counts[[x]])
   })
   
   

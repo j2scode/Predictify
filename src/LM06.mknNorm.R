@@ -21,16 +21,16 @@ mknNorm <- function(mkn, N) {
   message(paste('\nCalculating the normalizing factor at', startTime))
   
   message('...loading nGram counts and summary counts')
-  model <- lapply(seq_along(mkn$args$counts), function(x) {
-    loadObject(mkn$args$counts[[x]])
+  model <- lapply(seq_along(mkn$counts), function(x) {
+    loadObject(mkn$counts[[x]])
   })
-  summary <- loadObject(mkn$args$summary)
+  summary <- loadObject(mkn$summary)
 
   
   model <- lapply(seq_along(model), function(x) {
     current <- model[[x]]
     message(paste('...calculating normalizing factors for', 
-                  mkn$args$counts[[x]]$fileDesc))
+                  mkn$counts[[x]]$fileDesc))
     # Compute normalizing factor
     if (x < N) {
       norm <- rep(summary[x+1,2]$Count, nrow(current))
@@ -43,13 +43,13 @@ mknNorm <- function(mkn, N) {
     }
 
     # Save  counts
-    mkn$args$counts[[x]]$data <- current
-    saveObject(mkn$args$counts[[x]])
+    mkn$counts[[x]]$data <- current
+    saveObject(mkn$counts[[x]])
     
   })
   
   # Log Results
-  logR('MKN Normalizers', startTime, mkn$args$counts[[1]]$directory,' ')
+  logR('MKN Normalizers', startTime, mkn$counts[[1]]$directory,' ')
   
   # Alert User
   endTime <- Sys.time()

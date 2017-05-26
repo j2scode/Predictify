@@ -19,9 +19,9 @@ mknDiscount <- function(mkn) {
   
   message(paste("\nCalculating discounts for MKN model at", startTime))
   
-  discounts <- rbindlist(lapply(seq_along(mkn$args$counts), function(x) {
-    message(paste('...calculating discounts for', mkn$args$counts[[x]]$fileDesc))
-    nGram <- loadObject(mkn$args$counts[[x]])
+  discounts <- rbindlist(lapply(seq_along(mkn$counts), function(x) {
+    message(paste('...calculating discounts for', mkn$counts[[x]]$fileDesc))
+    nGram <- loadObject(mkn$counts[[x]])
     setkey(nGram, count)
     n1 <- nrow(nGram[count == 1])
     n2 <- nrow(nGram[count == 2])
@@ -35,19 +35,19 @@ mknDiscount <- function(mkn) {
     data.frame(nGramOrder = x, D = D, D0 = D0, D1 = D1, D2 = D2, D3 = D3) 
   }))
   
-  mkn$args$discounts$data <- discounts
-  saveObject(mkn$args$discounts)
+  mkn$discounts$data <- discounts
+  saveObject(mkn$discounts)
 
   # Log Results
-  logR('MKN Discount Calculation', startTime, mkn$args$discounts$directory,
-       mkn$args$discounts$fileName)
+  logR('MKN Discount Calculation', startTime, mkn$discounts$directory,
+       mkn$discounts$fileName)
   
   # Alert User
   endTime <- Sys.time()
   message(paste0('MKN Discounts Calculated at ', endTime))
   message(paste('Elapsed time is', round(difftime(endTime, startTime,  units = 'auto'), 2)))
   
-  return(mkn$args$discounts$data)
+  return(mkn$discounts$data)
 }
 ## ---- end
 #discounts <- mknDiscounts(lm$mkn)

@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "## ---- mkn_pipeline\n\n#------------------------------------------------------------------------------#\n#                               mknPipeline                                    #\n#------------------------------------------------------------------------------#\n#'  mknPipeline  \n#' \n#' This function executes the pipeline for the Modified Kneser-Ney Trigram\n#' and Quadgram Models.  It processes training corpora of various sizes and \n#' reports the perplexity of the designated test set. \n#' \n#' @param training - the meta data for the training set being modeled\n#' @param test - the meta data for the test set \n#' @param model - the meta data for the model\n#' @param regex - the regex patterns\n#' @param directories - the project directory structure\n#' @author John James\n#' @export\nmknPipeline <- function(training, test, model, regex, directories) {\n  \n  startTime <- Sys.time()\n  message(paste('\\nExecuting', model$mDesc, 'on',\n                training$corpusName, 'at', startTime))\n  \n  gc()\n  \n  # Initialize MKN language model\n  mknInit(model, training$nGrams, regex)\n  \n  # Create absolute counts of each nGram\n  features <- parallelizeTask(mknAbsCount, model, training$nGrams)\n  \n  # Create continuation counts of each nGram\n  parallelizeTask(mknCKN, model, model$mOrder)\n  \n  # Count nGram histories\n  parallelizeTask(mknHistories, model, model$mOrder)\n  \n  # Calculate discounts\n  discounts <- mknDiscount(model)\n  \n  # Update models with normalizing factors\n  parallelizeTask(mknNorm, model, model$mOrder)\n  \n  # Calculate pseudo probability alpha\n  parallelizeTask(mknAlpha, model)\n  \n  # Compute weighting factor lambda\n  parallelizeTask(mknLambda, model, model$mOrder)\n  \n  # Evaluate Model on Validation Set\n  evaluation <- mknEstimate(model,training$processed[[model$mOrder]],\n                                test$processed[[model$mOrder]],\n                                sents = 1000, directories)\n  \n  # Format evaluation package\n  evalPackage <- list()\n  evalPackage$model = model$mDesc\n  evalPackage$corpus = training$corpusName\n  evalPackage$pct = training$pct\n  evalPackage$eval = evaluation\n\n  # Save Analysis\n  output <- list()\n  output$directory <- directories$analysisDir\n  output$fileName  <- paste0(sub('\\\\..*', '', paste0('MKN-analysis-package-')),\n                             training$fileName,\n                             format(Sys.time(),'_%Y%m%d_%H%M%S'), '.Rdata')\n  output$objName   <- 'evalPackage'\n  output$data  <- evalPackage\n  saveObject(output)\n\n  # Log Results\n  logR('mknPipeline', startTime, '', '')\n  \n  # Alert User\n  endTime <- Sys.time()\n  message(paste('MKN Pipeline Complete at', endTime))\n  message(paste('Elapsed time is', round(difftime(endTime, startTime,  units = 'auto'), 2)))\n  \n  return(evalPackage)\n}\n## ---- end\n",
+    "created" : 1495718171560.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2101400436",
+    "id" : "1559EC50",
+    "lastKnownWriteTime" : 1495760985,
+    "last_content_update" : 1495760985095,
+    "path" : "~/Data Science/Data Science Projects/PredictifyR-1.0/src/LM00.mknPipeline.R",
+    "project_path" : "src/LM00.mknPipeline.R",
+    "properties" : {
+        "source_window_id" : ""
+    },
+    "relative_order" : 5,
+    "source_on_save" : true,
+    "source_window" : "",
+    "type" : "r_source"
+}

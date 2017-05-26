@@ -19,14 +19,14 @@ mknHistories <- function(mkn, N) {
   
   message(paste('\nCounting sequences for which the ngram occurs in history at', startTime))
   
-  model <- lapply(seq_along(mkn$args$counts), function(x) {
-    loadObject(mkn$args$counts[[x]])
+  model <- lapply(seq_along(mkn$counts), function(x) {
+    loadObject(mkn$counts[[x]])
   })
 
   lapply(seq_along(model), function(x) {
     if (x < N) {
       message(paste('...counting number of histories for', 
-                    mkn$args$counts[[x]]$fileDesc))
+                    mkn$counts[[x]]$fileDesc))
       
       current <- model[[x]]
       higher  <- model[[x+1]]
@@ -50,8 +50,8 @@ mknHistories <- function(mkn, N) {
       for (i in seq_along(current)) set(current, i=which(is.na(current[[i]])), j=i, value=0)
       
       # Save  counts
-      mkn$args$counts[[x]]$data <- current
-      saveObject(mkn$args$counts[[x]])
+      mkn$counts[[x]]$data <- current
+      saveObject(mkn$counts[[x]])
       
     }
   })

@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "```{r preprocessCorpora, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-12), results='hide'}     \noov <- parallelizeTask(preprocessCorpora, training, validation, test, directories)  \n```\n\n```{r processCorpora, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     \nparallelizeTask(processCorpora, training, validation, test)\n```\n\n```{r createNGrams, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     \nparallelizeTask(createNGrams, training, directories)\n```\n\n\n```{r alphaMkn, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     \nalphaMkn <- mknPipeline(training$alpha, validation$alpha, lm$mkn,  regexPatterns, directories)\n```\n\n```{r betaMkn, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     \nbetaMkn <- mknPipeline(training$beta, validation$beta, lm$mkn, regexPatterns, directories)  \n```\n\n```{r gammaMkn, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     \ngammaMkn <- mknPipeline(training$gamma, validation$gamma, lm$mkn, regexPatterns, directories)\n```\n\n```{r deltaMkn, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     \ndeltaMkn <- mknPipeline(training$delta, validation$delta, lm$mkn, regexPatterns, directories)\n```\n",
+    "created" : 1495296652612.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "556170985",
+    "id" : "34E76D88",
+    "lastKnownWriteTime" : 1495769687,
+    "last_content_update" : 1495769687029,
+    "path" : "~/Data Science/Data Science Projects/PredictifyR-1.0/documents/./E.0-pipeline-model.Rmd",
+    "project_path" : "documents/./E.0-pipeline-model.Rmd",
+    "properties" : {
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

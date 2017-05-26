@@ -26,20 +26,16 @@ mknEstimate <- function(mkn, training, test, sents = NULL, directories) {
   
   
   # Function that performs the quadgram probability estimate 
-  score <- function(quadGram) {
+  score <- function(quintgram) {
       
     # Calculate unigram probability, p1
-    s <- quadGram[4]
+    s <- quintgram[5]
     n1p <- model[[1]][ nGram == s][,c(cKN, norm)]
-    if (length(n1p) == 0) {
-      s <- 'UNK'
-      n1p <- model[[1]][ nGram == s][,c(cKN, norm)]
-    }
     p1 <- as.numeric(n1p[1] / n1p[2]) + 1 / V
     
     # Calculate bigram probability, p2
-    sfx <- paste0(quadGram[3:4], collapse = ' ')
-    cntx <- quadGram[3]
+    sfx <- paste0(quintgram[4:5], collapse = ' ')
+    cntx <- quintgram[4]
     alpha <- max(0,model[[2]][ nGram == sfx][, alpha])
     lambda <- model[[1]][ nGram == cntx][, lambda]
     if (length(lambda) == 0) {
@@ -48,8 +44,8 @@ mknEstimate <- function(mkn, training, test, sents = NULL, directories) {
     p2 <- alpha + lambda * p1
     
     # Calculate trigram probability, p3
-    sfx <- paste0(quadGram[2:4], collapse = ' ')
-    cntx <- paste0(quadGram[2:3], collapse = ' ')
+    sfx <- paste0(quintgram[3:5], collapse = ' ')
+    cntx <- paste0(quintgram[3:4], collapse = ' ')
     alpha <- max(0,model[[3]][ nGram == sfx][, alpha])
     lambda <- model[[2]][ nGram == cntx][, lambda]
     if (length(lambda) == 0) {
@@ -57,9 +53,9 @@ mknEstimate <- function(mkn, training, test, sents = NULL, directories) {
     }
     p3 <- alpha + lambda * p2
     
-    # Calculate quadgram probability, pp
-    sfx <- paste0(quadGram[1:4], collapse = ' ')
-    cntx <- paste0(quadGram[1:3], collapse = ' ')
+    # Calculate quadgram probability, p4
+    sfx <- paste0(quintgram[2:5], collapse = ' ')
+    cntx <- paste0(quintgram[2:4], collapse = ' ')
     alpha <- max(0,model[[4]][ nGram == sfx][, alpha])
     lambda <- model[[3]][ nGram == cntx][, lambda]
     if (length(lambda) == 0) {
@@ -67,15 +63,24 @@ mknEstimate <- function(mkn, training, test, sents = NULL, directories) {
     }
     p4 <- alpha + lambda * p3
     
-    return(log(p4))
+    # Calculate quintgram probability, p5
+    sfx <- paste0(quintgram[1:5], collapse = ' ')
+    cntx <- paste0(quintgram[1:4], collapse = ' ')
+    alpha <- max(0,model[[5]][ nGram == sfx][, alpha])
+    lambda <- model[[4]][ nGram == cntx][, lambda]
+    if (length(lambda) == 0) {
+      lambda <- 0.8 * as.numeric(discounts[5,4])
+    }
+    p5 <- alpha + lambda * p4
+    return(log(p5))
   }
   
   scoreSentence <- function(sentence) {
     tokens <- unlist(quanteda::tokenize(sentence, what = 'word'))
-    rbindlist(lapply(seq_along(tokens[1:(length(tokens)-3)]), function(x) {
+    rbindlist(lapply(seq_along(tokens[1:(length(tokens)-4)]), function(x) {
       nGram <- list()
-      nGram$quadGram <- paste0(tokens[x:(x+3)], collapse = ' ')
-      nGram$logProb <- score(tokens[x:(x+3)])
+      nGram$quintgram <- paste0(tokens[x:(x+4)], collapse = ' ')
+      nGram$logProb <- score(tokens[x:(x+4)])
       nGram
     }))
   }
@@ -86,8 +91,8 @@ mknEstimate <- function(mkn, training, test, sents = NULL, directories) {
   V <- length(featnames(df))
 
   message(paste('...loading language model'))
-  model <- lapply(seq_along(mkn$args$counts), function(x) {
-    loadObject(mkn$args$counts[[x]])
+  model <- lapply(seq_along(mkn$counts), function(x) {
+    loadObject(mkn$counts[[x]])
   })
 
   message(paste('...loading test data'))
@@ -95,10 +100,11 @@ mknEstimate <- function(mkn, training, test, sents = NULL, directories) {
   if (!(is.null(sents))) {
     document <- sampleData(document, numChunks = sents, chunkSize = 1, format = 'v')
   }
+  # Compute number of sentences and tokens w/o 'BOS'
   M <- length(document) # M = number of sentences
-  
+
   message('...loading discounts')
-  discounts <- loadObject(mkn$args$discounts)
+  discounts <- loadObject(mkn$discounts)
   
   message('...evaluating sentence probabilities')
   scores <- rbindlist(lapply(seq_along(document), function(x) {
@@ -130,11 +136,10 @@ mknEstimate <- function(mkn, training, test, sents = NULL, directories) {
     summary = list(
       date = startTime,
       end = endTime,
-      testSet = test$fileDesc,
+      trainingSet = training$corpusName,
       size = object.size(model),
       duration = duration,
-      sentences = M,
-      V = V,
+      testSents = M,
       words = N,
       perplexity = pp
     ),
@@ -145,7 +150,7 @@ mknEstimate <- function(mkn, training, test, sents = NULL, directories) {
   output <- list()
   output$directory <- directories$analysisDir
   output$fileName  <- paste0(sub('\\..*', '', paste0('')),
-                             paste0(test$fileName,'-estimates'),
+                             paste0(training$fileName,'-estimates'),
                              format(Sys.time(),'_%Y%m%d_%H%M%S'), '.Rdata')
   output$objName   <- 'evaluation'
   output$data  <- evaluation
@@ -161,4 +166,4 @@ mknEstimate <- function(mkn, training, test, sents = NULL, directories) {
   return(evaluation)
 }
 ## ---- end
-#est <- mknEstimate(lm$mkn$args, corpora$training$processed$text$quadgram,  corpora$validation$processed$text$quadgram, directories)
+#est <- mknEstimate(lm$mkn, corpora$training$processed$text$quadgram,  corpora$validation$processed$text$quadgram, directories)

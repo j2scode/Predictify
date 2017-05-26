@@ -73,8 +73,8 @@ oovTestSets <- function(test, vTraining) {
   message(paste('......extracted', length(oovWords), 'OOV Words'))
   
   # Tag and save document
-  test$processed$words[[1]]$data <- oovTagDocument(document, oovWords)
-  saveFile(test$processed$words[[1]])
+  test$processed[[1]]$data <- oovTagDocument(document, oovWords)
+  saveFile(test$processed[[1]])
   
   # Summarize Statistics 
   oov <- length(oovWords)
@@ -82,7 +82,7 @@ oovTestSets <- function(test, vTraining) {
                         V = V, N = N, oov = oov, oovrate = oov / N)
   names(summary) <- c('Corpus', 'Vocabulary','Tokens' ,'OOV', 'OOV Rate')
   
-  message(paste('...processing OOV for', test$corpusName, 'complete'))
+  message(paste('...processing OOV for', test$processed[[1]]$fileDesc, 'complete'))
   
   return(summary)
   
@@ -133,8 +133,8 @@ oovTrainingSet <- function(training) {
   message(paste('......extracted', length(hapaxLegomena), 'hapax legomena'))
  
   # Tag and save document
-  training$processed$words[[1]]$data <- oovTagDocument(document, hapaxLegomena) 
-  saveFile(training$processed$words[[1]])
+  training$processed[[1]]$data <- oovTagDocument(document, hapaxLegomena) 
+  saveFile(training$processed[[1]])
 
   # Summarize Statistics 
   oov <- length(hapaxLegomena)
@@ -165,17 +165,20 @@ oovTrainingSet <- function(training) {
 #' be similarly replaced with the an unknown pseudo-word.
 #' 
 #' @param training - the meta data for the training set 
+#' @param validation - the meta data for the validation set
 #' @param test - the meta data for the test set
 #' @return summary - summary of words, oov and oov rates for each corpus
 #' @author John James
 #' @export
-oovCorpora <- function(training, test) {
+oovCorpora <- function(training, validation, test) {
     
   # Performing OOV processing
   trainSummary <- oovTrainingSet(training)
-  testSummary <- oovTestSets(test, trainSummary$vocabulary)
+  valSummary  <- oovTestSets(validation, trainSummary$vocabulary)
+  testSummary <- oovTestSets(test,  trainSummary$vocabulary)
   
-  summary <- rbind(trainSummary$summary, testSummary)
+  
+  summary <- rbind(trainSummary$summary, valSummary, testSummary)
   
   return(summary)
 }
@@ -202,18 +205,22 @@ oovCorpora <- function(training, test) {
 #' 
 #' 
 #' @param training - the meta data for the training set
+#' @param validation - the meta data for the validation set
 #' @param test - the meta data for the test set (validation or test set)
 #' @param directories - the project directory structure
 #' @return summary - summary of words, oov and oov rates for each corpus
 #' @author John James
 #' @export
-preprocessCorpora <- function(training, validation, directories) {
+preprocessCorpora <- function(training, validation, test, directories) {
   
   startTime <- Sys.time()
   
-  message(paste("\nPreprocessing", training$corpusName, 'at', startTime))
+  message(paste("\nPreprocessing Training, Validation and Test Corpora at", startTime))
   
-  oov <- oovCorpora(training, test)
+  oov <- rbindlist(lapply(seq_along(training), function(t) {
+    oovCorpora(training[[t]], validation[[t]], test[[t]])
+  }))
+  
   
   # Save Results
   output <- list()

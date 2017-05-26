@@ -20,13 +20,13 @@ mknCKN <- function(mkn, N) {
   startTime <- Sys.time()
   
   message('\nPreparing to calculate continuation counts')
-  model <- lapply(seq_along(mkn$args$counts), function(x) {
-    loadObject(mkn$args$counts[[x]])
+  model <- lapply(seq_along(mkn$counts), function(x) {
+    loadObject(mkn$counts[[x]])
   })
 
   lapply(seq_along(model), function(x) {
     message(paste('...calculating continuation counts for', 
-                  mkn$args$counts[[x]]$fileDesc))
+                  mkn$counts[[x]]$fileDesc))
     if (x < N) {
       # Extract current and higher nGram counts
       current <- model[[x]]
@@ -46,13 +46,13 @@ mknCKN <- function(mkn, N) {
       current <- current[,cKN := count]
     }
     # Save counts
-    mkn$args$counts[[x]]$data <- current
-    saveObject(mkn$args$counts[[x]])
+    mkn$counts[[x]]$data <- current
+    saveObject(mkn$counts[[x]])
   })
   
 
   # Log Results
-  logR('MKN Continuation Counts', startTime, mkn$args$counts[[1]]$directory,' ')
+  logR('MKN Continuation Counts', startTime, mkn$counts[[1]]$directory,' ')
   
   # Alert User
   endTime <- Sys.time()

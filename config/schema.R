@@ -34,12 +34,14 @@ regexPatterns = list(
   context = list(
     bigrams   = "^((\\S+\\s+){0}\\S+).*$",
     trigrams  = "^((\\S+\\s+){1}\\S+).*$",
-    quadgrams = "^((\\S+\\s+){2}\\S+).*$"
+    quadgrams = "^((\\S+\\s+){2}\\S+).*$",
+    quintgrams = "^((\\S+\\s+){3}\\S+).*$"
   ),
   suffix = list(
     bigrams = "^.*\\s+((?:\\S+\\s+){0}\\S+)$",
     trigrams = "^.*\\s+((?:\\S+\\s+){1}\\S+)$",
-    quadgrams = "^.*\\s+((?:\\S+\\s+){2}\\S+)$"
+    quadgrams = "^.*\\s+((?:\\S+\\s+){2}\\S+)$",
+    quintgrams = "^.*\\s+((?:\\S+\\s+){3}\\S+)$"
   )
 ) # end of regexPatterns
 
@@ -108,8 +110,8 @@ directories <- list(
   cleanCorpus        = './data/clean',
   pilotCorpus        = './data/pilot',
   trainingCorpora    = './data/training',
-  validationCorpus   = './data/validation',
-  testCorpus         = './data/test',
+  validationCorpora  = './data/validation',
+  testCorpora        = './data/test',
   lm                 = './lm',
   testingDir         = './test'
 )
@@ -212,7 +214,7 @@ triGramText <- list(
   )
 )
 
-quadGrams <- list(
+quintGrams <- list(
   unigrams = list(
     fileDesc = 'Unigrams',
     fileName = 'unigrams.Rdata',
@@ -232,10 +234,15 @@ quadGrams <- list(
     fileDesc = 'Quadgrams',
     fileName = 'quadgrams.Rdata',
     objName = 'quadgrams'
+  ),
+  quintgrams = list(
+    fileDesc = 'Quintgrams',
+    fileName = 'quintgrams.Rdata',
+    objName = 'quintgrams'
   )
 )
 
-quadGramText <- list(
+quintGramText <- list(
   unigrams = list(
     fileDesc = 'Unigrams',
     fileName = 'unigrams.txt',
@@ -252,9 +259,14 @@ quadGramText <- list(
     objName = 'trigrams'
   ),
   quadgrams = list(
-    fileDesc = 'Quadgrams',
-    fileName = 'quadgrams.txt',
-    objName = 'quadgrams'
+    fileDesc = 'quadGrams',
+    fileName = 'quadGrams.txt',
+    objName = 'quadGrams'
+  ),
+  quintgrams = list(
+    fileDesc = 'Quintgrams',
+    fileName = 'quintgrams.txt',
+    objName = 'quintgrams'
   )
 )
 
@@ -326,12 +338,12 @@ corpora = list(
       p$objName  <- registers[[r]]$objName
       p
     }),
-    nGrams = lapply(seq_along(quadGrams), function(n) {
+    nGrams = lapply(seq_along(quintGrams), function(n) {
       nGram <- list()
       nGram$directory <- file.path(directories$pilotCorpus, 'nGrams')
-      nGram$objName <- quadGrams[[n]]$objName
-      nGram$fileName <- quadGrams[[n]]$fileName
-      nGram$fileDesc <- quadGrams[[n]]$fileDesc
+      nGram$objName <- quintGrams[[n]]$objName
+      nGram$fileName <- quintGrams[[n]]$fileName
+      nGram$fileDesc <- quintGrams[[n]]$fileDesc
       nGram
     })
   ),
@@ -350,66 +362,22 @@ corpora = list(
         d$objName  <- registers[[r]]$objName
         d
       }),
-      pos  = list(
-        tags = lapply(seq_along(registers), function(r) {
-          t <- list()
-          t$directory <- file.path(directories$trainingCorpora, 'alpha', 'posTags')
-          t$fileName <- registers[[r]]$fileName
-          t$fileDesc <- registers[[r]]$fileDesc
-          t$objName  <- registers[[r]]$objName
-          t
-        }),
-        pairs = lapply(seq_along(registers), function(r) {
-          p <- list()
-          p$directory <- file.path(directories$trainingCorpora, 'alpha', 'posPairs')
-          p$fileName <- registers[[r]]$fileName
-          p$fileDesc <- registers[[r]]$fileDesc
-          p$objName  <- registers[[r]]$objName
-          p
-        })
-      ),
-      processed = list(
-        words = lapply(seq_along(quadGramText), function(n) {
-          nGram <- list()
-          nGram$directory <- file.path(directories$trainingCorpora, 'alpha', 'processed', 'words')
-          nGram$objName <- quadGramText[[n]]$objName
-          nGram$fileName <- quadGramText[[n]]$fileName
-          nGram$fileDesc <- quadGramText[[n]]$fileDesc
-          nGram
-        }),
-        pos = lapply(seq_along(triGramText), function(n) {
-          nGram <- list()
-          nGram$directory <- file.path(directories$trainingCorpora, 'alpha', 'processed', 'pos')
-          nGram$objName <- triGramText[[n]]$objName
-          nGram$fileName <- triGramText[[n]]$fileName
-          nGram$fileDesc <- triGramText[[n]]$fileDesc
-          nGram
-        }),
-        pairs = list(
-          directory = file.path(directories$trainingCorpora, 'alpha', 'processed', 'pairs'),
-          fileDesc = 'POS Word Pairs',
-          fileName = 'pos-word-pairs.txt',
-          objName = 'posWordPairs'
-        )
-      ),
-      nGrams = list(
-        words = lapply(seq_along(quadGrams), function(n) {
-          nGram <- list()
-          nGram$directory <- file.path(directories$trainingCorpora, 'alpha', 'nGrams', 'word')
-          nGram$objName <- quadGrams[[n]]$objName
-          nGram$fileName <- quadGrams[[n]]$fileName
-          nGram$fileDesc <- quadGrams[[n]]$fileDesc
-          nGram
-        }),
-        pos = lapply(seq_along(triGrams), function(n) {
-          nGram <- list()
-          nGram$directory <- file.path(directories$trainingCorpora, 'alpha', 'nGrams', 'pos')
-          nGram$objName <- triGrams[[n]]$objName
-          nGram$fileName <- triGrams[[n]]$fileName
-          nGram$fileDesc <- triGrams[[n]]$fileDesc
-          nGram
-        })
-      )
+      processed = lapply(seq_along(quintGramText), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$trainingCorpora, 'alpha', 'processed')
+        nGram$objName <- quintGramText[[n]]$objName
+        nGram$fileName <- quintGramText[[n]]$fileName
+        nGram$fileDesc <- quintGramText[[n]]$fileDesc
+        nGram
+      }),
+      nGrams = lapply(seq_along(quintGrams), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$trainingCorpora, 'alpha', 'nGrams')
+        nGram$objName <- quintGrams[[n]]$objName
+        nGram$fileName <- quintGrams[[n]]$fileName
+        nGram$fileDesc <- quintGrams[[n]]$fileDesc
+        nGram
+      })
     ),
     beta = list(
       corpusName = 'Training Set Beta',
@@ -425,66 +393,22 @@ corpora = list(
         d$objName  <- registers[[r]]$objName
         d
       }),
-      pos  = list(
-        tags = lapply(seq_along(registers), function(r) {
-          t <- list()
-          t$directory <- file.path(directories$trainingCorpora, 'beta', 'posTags')
-          t$fileName <- registers[[r]]$fileName
-          t$fileDesc <- registers[[r]]$fileDesc
-          t$objName  <- registers[[r]]$objName
-          t
-        }),
-        pairs = lapply(seq_along(registers), function(r) {
-          p <- list()
-          p$directory <- file.path(directories$trainingCorpora, 'beta', 'posPairs')
-          p$fileName <- registers[[r]]$fileName
-          p$fileDesc <- registers[[r]]$fileDesc
-          p$objName  <- registers[[r]]$objName
-          p
-        })
-      ),
-      processed = list(
-        words = lapply(seq_along(quadGramText), function(n) {
-          nGram <- list()
-          nGram$directory <- file.path(directories$trainingCorpora, 'beta', 'processed', 'words')
-          nGram$objName <- quadGramText[[n]]$objName
-          nGram$fileName <- quadGramText[[n]]$fileName
-          nGram$fileDesc <- quadGramText[[n]]$fileDesc
-          nGram
-        }),
-        pos = lapply(seq_along(triGramText), function(n) {
-          nGram <- list()
-          nGram$directory <- file.path(directories$trainingCorpora, 'beta', 'processed', 'pos')
-          nGram$objName <- triGramText[[n]]$objName
-          nGram$fileName <- triGramText[[n]]$fileName
-          nGram$fileDesc <- triGramText[[n]]$fileDesc
-          nGram
-        }),
-        pairs = list(
-          directory = file.path(directories$trainingCorpora, 'beta', 'processed', 'pairs'),
-          fileDesc = 'POS Word Pairs',
-          fileName = 'pos-word-pairs.txt',
-          objName = 'posWordPairs'
-        )
-      ),
-      nGrams = list(
-        words = lapply(seq_along(quadGrams), function(n) {
-          nGram <- list()
-          nGram$directory <- file.path(directories$trainingCorpora, 'beta', 'nGrams', 'word')
-          nGram$objName <- quadGrams[[n]]$objName
-          nGram$fileName <- quadGrams[[n]]$fileName
-          nGram$fileDesc <- quadGrams[[n]]$fileDesc
-          nGram
-        }),
-        pos = lapply(seq_along(triGrams), function(n) {
-          nGram <- list()
-          nGram$directory <- file.path(directories$trainingCorpora, 'beta', 'nGrams', 'pos')
-          nGram$objName <- triGrams[[n]]$objName
-          nGram$fileName <- triGrams[[n]]$fileName
-          nGram$fileDesc <- triGrams[[n]]$fileDesc
-          nGram
-        })
-      )
+      processed = lapply(seq_along(quintGramText), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$trainingCorpora, 'beta', 'processed')
+        nGram$objName <- quintGramText[[n]]$objName
+        nGram$fileName <- quintGramText[[n]]$fileName
+        nGram$fileDesc <- quintGramText[[n]]$fileDesc
+        nGram
+      }),
+      nGrams = lapply(seq_along(quintGrams), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$trainingCorpora, 'beta', 'nGrams')
+        nGram$objName <- quintGrams[[n]]$objName
+        nGram$fileName <- quintGrams[[n]]$fileName
+        nGram$fileDesc <- quintGrams[[n]]$fileDesc
+        nGram
+      })
     ),
     gamma = list(
       corpusName = 'Training Set Gamma',
@@ -500,66 +424,22 @@ corpora = list(
         d$objName  <- registers[[r]]$objName
         d
       }),
-      pos  = list(
-        tags = lapply(seq_along(registers), function(r) {
-          t <- list()
-          t$directory <- file.path(directories$trainingCorpora, 'gamma', 'posTags')
-          t$fileName <- registers[[r]]$fileName
-          t$fileDesc <- registers[[r]]$fileDesc
-          t$objName  <- registers[[r]]$objName
-          t
-        }),
-        pairs = lapply(seq_along(registers), function(r) {
-          p <- list()
-          p$directory <- file.path(directories$trainingCorpora, 'gamma', 'posPairs')
-          p$fileName <- registers[[r]]$fileName
-          p$fileDesc <- registers[[r]]$fileDesc
-          p$objName  <- registers[[r]]$objName
-          p
-        })
-      ),
-      processed = list(
-        words = lapply(seq_along(quadGramText), function(n) {
-          nGram <- list()
-          nGram$directory <- file.path(directories$trainingCorpora, 'gamma', 'processed', 'words')
-          nGram$objName <- quadGramText[[n]]$objName
-          nGram$fileName <- quadGramText[[n]]$fileName
-          nGram$fileDesc <- quadGramText[[n]]$fileDesc
-          nGram
-        }),
-        pos = lapply(seq_along(triGramText), function(n) {
-          nGram <- list()
-          nGram$directory <- file.path(directories$trainingCorpora, 'gamma', 'processed', 'pos')
-          nGram$objName <- triGramText[[n]]$objName
-          nGram$fileName <- triGramText[[n]]$fileName
-          nGram$fileDesc <- triGramText[[n]]$fileDesc
-          nGram
-        }),
-        pairs = list(
-          directory = file.path(directories$trainingCorpora, 'gamma', 'processed', 'pairs'),
-          fileDesc = 'POS Word Pairs',
-          fileName = 'pos-word-pairs.txt',
-          objName = 'posWordPairs'
-        )
-      ),
-      nGrams = list(
-        words = lapply(seq_along(quadGrams), function(n) {
-          nGram <- list()
-          nGram$directory <- file.path(directories$trainingCorpora, 'gamma', 'nGrams', 'word')
-          nGram$objName <- quadGrams[[n]]$objName
-          nGram$fileName <- quadGrams[[n]]$fileName
-          nGram$fileDesc <- quadGrams[[n]]$fileDesc
-          nGram
-        }),
-        pos = lapply(seq_along(triGrams), function(n) {
-          nGram <- list()
-          nGram$directory <- file.path(directories$trainingCorpora, 'gamma', 'nGrams', 'pos')
-          nGram$objName <- triGrams[[n]]$objName
-          nGram$fileName <- triGrams[[n]]$fileName
-          nGram$fileDesc <- triGrams[[n]]$fileDesc
-          nGram
-        })
-      )
+      processed = lapply(seq_along(quintGramText), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$trainingCorpora, 'gamma', 'processed')
+        nGram$objName <- quintGramText[[n]]$objName
+        nGram$fileName <- quintGramText[[n]]$fileName
+        nGram$fileDesc <- quintGramText[[n]]$fileDesc
+        nGram
+      }),
+      nGrams = lapply(seq_along(quintGrams), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$trainingCorpora, 'gamma', 'nGrams')
+        nGram$objName <- quintGrams[[n]]$objName
+        nGram$fileName <- quintGrams[[n]]$fileName
+        nGram$fileDesc <- quintGrams[[n]]$fileDesc
+        nGram
+      })
     ),
     delta = list(
       corpusName = 'Training Set Delta',
@@ -575,157 +455,310 @@ corpora = list(
         d$objName  <- registers[[r]]$objName
         d
       }),
-      pos  = list(
-        tags = lapply(seq_along(registers), function(r) {
-          t <- list()
-          t$directory <- file.path(directories$trainingCorpora, 'delta', 'posTags')
-          t$fileName <- registers[[r]]$fileName
-          t$fileDesc <- registers[[r]]$fileDesc
-          t$objName  <- registers[[r]]$objName
-          t
-        }),
-        pairs = lapply(seq_along(registers), function(r) {
-          p <- list()
-          p$directory <- file.path(directories$trainingCorpora, 'delta', 'posPairs')
-          p$fileName <- registers[[r]]$fileName
-          p$fileDesc <- registers[[r]]$fileDesc
-          p$objName  <- registers[[r]]$objName
-          p
-        })
-      ),
-      processed = list(
-        words = lapply(seq_along(quadGramText), function(n) {
-          nGram <- list()
-          nGram$directory <- file.path(directories$trainingCorpora, 'delta', 'processed', 'words')
-          nGram$objName <- quadGramText[[n]]$objName
-          nGram$fileName <- quadGramText[[n]]$fileName
-          nGram$fileDesc <- quadGramText[[n]]$fileDesc
-          nGram
-        }),
-        pos = lapply(seq_along(triGramText), function(n) {
-          nGram <- list()
-          nGram$directory <- file.path(directories$trainingCorpora, 'delta', 'processed', 'pos')
-          nGram$objName <- triGramText[[n]]$objName
-          nGram$fileName <- triGramText[[n]]$fileName
-          nGram$fileDesc <- triGramText[[n]]$fileDesc
-          nGram
-        }),
-        pairs = list(
-          directory = file.path(directories$trainingCorpora, 'delta', 'processed', 'pairs'),
-          fileDesc = 'POS Word Pairs',
-          fileName = 'pos-word-pairs.txt',
-          objName = 'posWordPairs'
-        )
-      ),
-      nGrams = list(
-        words = lapply(seq_along(quadGrams), function(n) {
-          nGram <- list()
-          nGram$directory <- file.path(directories$trainingCorpora, 'delta', 'nGrams', 'word')
-          nGram$objName <- quadGrams[[n]]$objName
-          nGram$fileName <- quadGrams[[n]]$fileName
-          nGram$fileDesc <- quadGrams[[n]]$fileDesc
-          nGram
-        }),
-        pos = lapply(seq_along(triGrams), function(n) {
-          nGram <- list()
-          nGram$directory <- file.path(directories$trainingCorpora, 'delta', 'nGrams', 'pos')
-          nGram$objName <- triGrams[[n]]$objName
-          nGram$fileName <- triGrams[[n]]$fileName
-          nGram$fileDesc <- triGrams[[n]]$fileDesc
-          nGram
-        })
-      )
+      processed = lapply(seq_along(quintGramText), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$trainingCorpora, 'delta', 'processed')
+        nGram$objName <- quintGramText[[n]]$objName
+        nGram$fileName <- quintGramText[[n]]$fileName
+        nGram$fileDesc <- quintGramText[[n]]$fileDesc
+        nGram
+      }),
+      nGrams = lapply(seq_along(quintGrams), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$trainingCorpora, 'delta', 'nGrams')
+        nGram$objName <- quintGrams[[n]]$objName
+        nGram$fileName <- quintGrams[[n]]$fileName
+        nGram$fileDesc <- quintGrams[[n]]$fileDesc
+        nGram
+      })
     )
   ), # end of training
   validation = list(
-    corpusName = 'Validation Corpus',
-    directory  = directories$validationCorpus,
-    fileName = 'validation-set',
-    objName = 'validationSet',
-    documents = lapply(seq_along(registers), function(r) {
-      d <- list()
-      d$directory <- file.path(directories$validationCorpus, 'documents')
-      d$fileName <- registers[[r]]$fileName
-      d$fileDesc <- registers[[r]]$fileDesc
-      d$objName  <- registers[[r]]$objName
-      d
-    }),
-    processed = list(
-      words = lapply(seq_along(quadGramText), function(n) {
+    alpha = list(
+      corpusName = 'Validation Set Alpha',
+      directory = file.path(directories$validationCorpora, 'alpha'),
+      fileName = 'validation-set-alpha',
+      objName = 'validationSetAlpha',
+      documents = lapply(seq_along(registers), function(r) {
+        d <- list()
+        d$directory <- file.path(directories$validationCorpora, 'alpha', 'documents')
+        d$fileName <- registers[[r]]$fileName
+        d$fileDesc <- registers[[r]]$fileDesc
+        d$objName  <- registers[[r]]$objName
+        d
+      }),
+      processed = lapply(seq_along(quintGramText), function(n) {
         nGram <- list()
-        nGram$directory <- file.path(directories$validationCorpus, 'processed', 'words')
-        nGram$objName <- quadGramText[[n]]$objName
-        nGram$fileName <- quadGramText[[n]]$fileName
-        nGram$fileDesc <- quadGramText[[n]]$fileDesc
+        nGram$directory <- file.path(directories$validationCorpora, 'alpha', 'processed')
+        nGram$objName <- quintGramText[[n]]$objName
+        nGram$fileName <- quintGramText[[n]]$fileName
+        nGram$fileDesc <- quintGramText[[n]]$fileDesc
+        nGram
+      }),
+      nGrams = lapply(seq_along(quintGrams), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$validationCorpora, 'alpha', 'nGrams')
+        nGram$objName <- quintGrams[[n]]$objName
+        nGram$fileName <- quintGrams[[n]]$fileName
+        nGram$fileDesc <- quintGrams[[n]]$fileDesc
+        nGram
+      })
+    ),
+    beta = list(
+      corpusName = 'Validation Set Beta',
+      directory = file.path(directories$validationCorpora, 'beta'),
+      fileName = 'validation-set-beta',
+      objName = 'validationSetBeta',
+      documents = lapply(seq_along(registers), function(r) {
+        d <- list()
+        d$directory <- file.path(directories$validationCorpora, 'beta', 'documents')
+        d$fileName <- registers[[r]]$fileName
+        d$fileDesc <- registers[[r]]$fileDesc
+        d$objName  <- registers[[r]]$objName
+        d
+      }),
+      processed = lapply(seq_along(quintGramText), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$validationCorpora, 'beta', 'processed')
+        nGram$objName <- quintGramText[[n]]$objName
+        nGram$fileName <- quintGramText[[n]]$fileName
+        nGram$fileDesc <- quintGramText[[n]]$fileDesc
+        nGram
+      }),
+      nGrams = lapply(seq_along(quintGrams), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$validationCorpora, 'beta', 'nGrams')
+        nGram$objName <- quintGrams[[n]]$objName
+        nGram$fileName <- quintGrams[[n]]$fileName
+        nGram$fileDesc <- quintGrams[[n]]$fileDesc
+        nGram
+      })
+    ),
+    gamma = list(
+      corpusName = 'Validation Set Gamma',
+      directory = file.path(directories$validationCorpora, 'gamma'),
+      fileName = 'validation-set-gamma',
+      objName = 'validationSetGamma',
+      documents = lapply(seq_along(registers), function(r) {
+        d <- list()
+        d$directory <- file.path(directories$validationCorpora, 'gamma', 'documents')
+        d$fileName <- registers[[r]]$fileName
+        d$fileDesc <- registers[[r]]$fileDesc
+        d$objName  <- registers[[r]]$objName
+        d
+      }),
+      processed = lapply(seq_along(quintGramText), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$validationCorpora, 'gamma', 'processed')
+        nGram$objName <- quintGramText[[n]]$objName
+        nGram$fileName <- quintGramText[[n]]$fileName
+        nGram$fileDesc <- quintGramText[[n]]$fileDesc
+        nGram
+      }),
+      nGrams = lapply(seq_along(quintGrams), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$validationCorpora, 'gamma', 'nGrams')
+        nGram$objName <- quintGrams[[n]]$objName
+        nGram$fileName <- quintGrams[[n]]$fileName
+        nGram$fileDesc <- quintGrams[[n]]$fileDesc
+        nGram
+      })
+    ),
+    delta = list(
+      corpusName = 'Validation Set Delta',
+      directory = file.path(directories$validationCorpora, 'delta'),
+      fileName = 'validation-set-delta',
+      objName = 'validationSetDelta',
+      documents = lapply(seq_along(registers), function(r) {
+        d <- list()
+        d$directory <- file.path(directories$validationCorpora, 'delta', 'documents')
+        d$fileName <- registers[[r]]$fileName
+        d$fileDesc <- registers[[r]]$fileDesc
+        d$objName  <- registers[[r]]$objName
+        d
+      }),
+      processed = lapply(seq_along(quintGramText), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$validationCorpora, 'delta', 'processed')
+        nGram$objName <- quintGramText[[n]]$objName
+        nGram$fileName <- quintGramText[[n]]$fileName
+        nGram$fileDesc <- quintGramText[[n]]$fileDesc
+        nGram
+      }),
+      nGrams = lapply(seq_along(quintGrams), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$validationCorpora, 'delta', 'nGrams')
+        nGram$objName <- quintGrams[[n]]$objName
+        nGram$fileName <- quintGrams[[n]]$fileName
+        nGram$fileDesc <- quintGrams[[n]]$fileDesc
         nGram
       })
     )
-  ),
+  ), # end of validation
   test = list(
-    corpusName = 'Test Corpus',
-    directory  = directories$testCorpus,
-    fileName = 'test-set',
-    objName = 'testSet',
-    documents = lapply(seq_along(registers), function(r) {
-      d <- list()
-      d$directory <- directories$testCorpus
-      d$fileName <- registers[[r]]$fileName
-      d$fileDesc <- registers[[r]]$fileDesc
-      d$objName  <- registers[[r]]$objName
-      d
-    }),
-    processed = list(
-      words = lapply(seq_along(quadGramText), function(n) {
+    alpha = list(
+      corpusName = 'Test Set Alpha',
+      directory = file.path(directories$testCorpora, 'alpha'),
+      fileName = 'test-set-alpha',
+      objName = 'testSetAlpha',
+      pct = 10,
+      documents = lapply(seq_along(registers), function(r) {
+        d <- list()
+        d$directory <- file.path(directories$testCorpora, 'alpha', 'documents')
+        d$fileName <- registers[[r]]$fileName
+        d$fileDesc <- registers[[r]]$fileDesc
+        d$objName  <- registers[[r]]$objName
+        d
+      }),
+      processed = lapply(seq_along(quintGramText), function(n) {
         nGram <- list()
-        nGram$directory <- file.path(directories$validationCorpus, 'processed', 'words')
-        nGram$objName <- quadGramText[[n]]$objName
-        nGram$fileName <- quadGramText[[n]]$fileName
-        nGram$fileDesc <- quadGramText[[n]]$fileDesc
+        nGram$directory <- file.path(directories$testCorpora, 'alpha', 'processed')
+        nGram$objName <- quintGramText[[n]]$objName
+        nGram$fileName <- quintGramText[[n]]$fileName
+        nGram$fileDesc <- quintGramText[[n]]$fileDesc
+        nGram
+      }),
+      nGrams = lapply(seq_along(quintGrams), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$testCorpora, 'alpha', 'nGrams')
+        nGram$objName <- quintGrams[[n]]$objName
+        nGram$fileName <- quintGrams[[n]]$fileName
+        nGram$fileDesc <- quintGrams[[n]]$fileDesc
+        nGram
+      })
+    ),
+    beta = list(
+      corpusName = 'Test Set Beta',
+      directory = file.path(directories$testCorpora, 'beta'),
+      fileName = 'test-set-beta',
+      objName = 'testSetBeta',
+      pct = 10,
+      documents = lapply(seq_along(registers), function(r) {
+        d <- list()
+        d$directory <- file.path(directories$testCorpora, 'beta', 'documents')
+        d$fileName <- registers[[r]]$fileName
+        d$fileDesc <- registers[[r]]$fileDesc
+        d$objName  <- registers[[r]]$objName
+        d
+      }),
+      processed = lapply(seq_along(quintGramText), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$testCorpora, 'beta', 'processed')
+        nGram$objName <- quintGramText[[n]]$objName
+        nGram$fileName <- quintGramText[[n]]$fileName
+        nGram$fileDesc <- quintGramText[[n]]$fileDesc
+        nGram
+      }),
+      nGrams = lapply(seq_along(quintGrams), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$testCorpora, 'beta', 'nGrams')
+        nGram$objName <- quintGrams[[n]]$objName
+        nGram$fileName <- quintGrams[[n]]$fileName
+        nGram$fileDesc <- quintGrams[[n]]$fileDesc
+        nGram
+      })
+    ),
+    gamma = list(
+      corpusName = 'Test Set Gamma',
+      directory = file.path(directories$testCorpora, 'gamma'),
+      fileName = 'test-set-gamma',
+      objName = 'testSetGamma',
+      pct = 10,
+      documents = lapply(seq_along(registers), function(r) {
+        d <- list()
+        d$directory <- file.path(directories$testCorpora, 'gamma', 'documents')
+        d$fileName <- registers[[r]]$fileName
+        d$fileDesc <- registers[[r]]$fileDesc
+        d$objName  <- registers[[r]]$objName
+        d
+      }),
+      processed = lapply(seq_along(quintGramText), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$testCorpora, 'gamma', 'processed')
+        nGram$objName <- quintGramText[[n]]$objName
+        nGram$fileName <- quintGramText[[n]]$fileName
+        nGram$fileDesc <- quintGramText[[n]]$fileDesc
+        nGram
+      }),
+      nGrams = lapply(seq_along(quintGrams), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$testCorpora, 'gamma', 'nGrams')
+        nGram$objName <- quintGrams[[n]]$objName
+        nGram$fileName <- quintGrams[[n]]$fileName
+        nGram$fileDesc <- quintGrams[[n]]$fileDesc
+        nGram
+      })
+    ),
+    delta = list(
+      corpusName = 'Test Set Delta',
+      directory = file.path(directories$testCorpora, 'delta'),
+      fileName = 'test-set-delta',
+      objName = 'testSetDelta',
+      pct = 10,
+      documents = lapply(seq_along(registers), function(r) {
+        d <- list()
+        d$directory <- file.path(directories$testCorpora, 'delta', 'documents')
+        d$fileName <- registers[[r]]$fileName
+        d$fileDesc <- registers[[r]]$fileDesc
+        d$objName  <- registers[[r]]$objName
+        d
+      }),
+      processed = lapply(seq_along(quintGramText), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$testCorpora, 'delta', 'processed')
+        nGram$objName <- quintGramText[[n]]$objName
+        nGram$fileName <- quintGramText[[n]]$fileName
+        nGram$fileDesc <- quintGramText[[n]]$fileDesc
+        nGram
+      }),
+      nGrams = lapply(seq_along(quintGrams), function(n) {
+        nGram <- list()
+        nGram$directory <- file.path(directories$testCorpora, 'delta', 'nGrams')
+        nGram$objName <- quintGrams[[n]]$objName
+        nGram$fileName <- quintGrams[[n]]$fileName
+        nGram$fileDesc <- quintGrams[[n]]$fileDesc
         nGram
       })
     )
-  )
+  ) # end of test
 )# end of corpora
 
 
 lm <- list(
-  mkn4 = list(
-    func = 'trainMKN4',
-    args = list(
-      mName = 'quadgramMKN4',
-      mDesc = 'Quadgram MKN4 Model',
-      mOrder = 4,
-      directory = file.path(directories$lm, 'mkn4'),
-      regex = regexPatterns,
-      summary = list(
-        directory = file.path(directories$lm, 'mkn4'),
-        fileDesc = 'MKN4 N-Gram Count Summary',
-        fileName = 'mkn4-ngram-count-summary.Rdata',
-        objName  = 'mkn4NGramCountSummary'
-      ),
-      discounts = list(
-        directory = file.path(directories$lm, 'mkn4'),
-        fileDesc = 'MKN4 Discounts',
-        fileName = 'mkn4-discounts.Rdata',
-        objName  = 'mkn4Discounts'
-      ),
-      counts = lapply(seq_along(quadGrams), function(n) {
-        nGram = list()
-        nGram$directory <- file.path(directories$lm, 'mkn4', 'counts')
-        nGram$objName  <- paste0('mkn4', quadGrams[[n]]$fileDesc)
-        nGram$fileName <- paste0('mkn4-', quadGrams[[n]]$fileName)
-        nGram$fileDesc <- paste0('MKN4 ', quadGrams[[n]]$fileDesc)
-        nGram
-      }),
-      model = lapply(seq_along(quadGrams), function(n) {
-        nGram = list()
-        nGram$directory <- file.path(directories$lm, 'mkn4', 'model')
-        nGram$objName  <- paste0('mkn4', quadGrams[[n]]$fileDesc)
-        nGram$fileName <- paste0('mkn4-', quadGrams[[n]]$fileName)
-        nGram$fileDesc <- paste0('MKN4 ', quadGrams[[n]]$fileDesc)
-        nGram
-      })
-    )# end of args
+  mkn = list(
+    mName = 'MKN',
+    mDesc = 'MKN Model',
+    mOrder = 5,
+    directory = file.path(directories$lm, 'mkn'),
+    regex = regexPatterns,
+    summary = list(
+      directory = file.path(directories$lm, 'mkn'),
+      fileDesc = 'MKN N-Gram Count Summary',
+      fileName = 'mkn-ngram-count-summary.Rdata',
+      objName  = 'mknNGramCountSummary'
+    ),
+    discounts = list(
+      directory = file.path(directories$lm, 'mkn'),
+      fileDesc = 'MKN Discounts',
+      fileName = 'mkn-discounts.Rdata',
+      objName  = 'mknDiscounts'
+    ),
+    counts = lapply(seq_along(quintGrams), function(n) {
+      nGram = list()
+      nGram$directory <- file.path(directories$lm, 'mkn', 'counts')
+      nGram$objName  <- paste0('mkn', quintGrams[[n]]$fileDesc)
+      nGram$fileName <- paste0('mkn-', quintGrams[[n]]$fileName)
+      nGram$fileDesc <- paste0('MKN ', quintGrams[[n]]$fileDesc)
+      nGram
+    }),
+    model = lapply(seq_along(quintGrams), function(n) {
+      nGram = list()
+      nGram$directory <- file.path(directories$lm, 'mkn', 'model')
+      nGram$objName  <- paste0('mkn', quintGrams[[n]]$fileDesc)
+      nGram$fileName <- paste0('mkn-', quintGrams[[n]]$fileName)
+      nGram$fileDesc <- paste0('MKN ', quintGrams[[n]]$fileDesc)
+      nGram
+    })
   )# end of mkn
 )
 

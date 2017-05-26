@@ -26,12 +26,12 @@ mknPrune <- function(mkn, korpus, regex) {
     nGrams <- featnames(nGrams)
     unk <- paste(rep("UNK", x), collapse = ' ')
     nGrams <- c(nGrams, unk)
-    counts <- loadObject(mkn$args$counts[[x]])
+    counts <- loadObject(mkn$counts[[x]])
     counts <- counts[ nGram %in% nGrams]
     
     # Save counts
-    mkn$args$counts[[x]]$data <- counts
-    saveObject(mkn$args$counts[[x]])
+    mkn$counts[[x]]$data <- counts
+    saveObject(mkn$counts[[x]])
     
     summary <- list(
       nGramOrder = x,
@@ -43,7 +43,7 @@ mknPrune <- function(mkn, korpus, regex) {
   
 
   # Log and Return results
-  logR('mknPrune', startTime, mkn$args$model$unigrams$directory, ' ')
+  logR('mknPrune', startTime, mkn$model$unigrams$directory, ' ')
   
   # Alert User
   endTime <- Sys.time()

@@ -15,19 +15,20 @@
 mknLambda <- function(mkn, N) {
   
   startTime <- Sys.time()
+  memory.limit(20000)
   
   message(paste('\nCalculating scaling factor lambda at', startTime))
   
   message('...loading nGram counts and discounts')
-  model <- lapply(seq_along(mkn$args$counts), function(x) {
-    loadObject(mkn$args$counts[[x]])
+  model <- lapply(seq_along(mkn$counts), function(x) {
+    loadObject(mkn$counts[[x]])
   })
-  discounts <- loadObject(mkn$args$discounts)
+  discounts <- loadObject(mkn$discounts)
 
   lapply(seq_along(model), function(x) {
-    if (x < 4) {
+    if (x < N) {
       message(paste('...calculating scaling factor lambda for', 
-                    mkn$args$counts[[x]]$fileDesc))
+                    mkn$counts[[x]]$fileDesc))
       #Obtain Model
       current <- model[[x]]
 
@@ -49,14 +50,14 @@ mknLambda <- function(mkn, N) {
       current <- current[, lambda := DnNn / norm]
 
       # Save  counts
-      mkn$args$counts[[x]]$data <- current
-      saveObject(mkn$args$counts[[x]])
+      mkn$counts[[x]]$data <- current
+      saveObject(mkn$counts[[x]])
       
     }
   })
   
   # Log Results
-  logR('MKN Lambda Counts', startTime, mkn$args$counts[[1]]$directory,' ')
+  logR('MKN Lambda Counts', startTime, mkn$counts[[1]]$directory,' ')
   
   # Alert User
   endTime <- Sys.time()

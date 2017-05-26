@@ -20,7 +20,7 @@ features <- parallelizeTask(verifyLinguistics, clean, pilot, posTags, directorie
 ```
 
 ```{r buildCorpora, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-5), results='hide'}     
-parallelizeTask(buildCorpora, pilotDesign, clean, training, validation, test)
+parallelizeTask(buildCorpora, pilotDesign, clean, training, validation, test)  
 ```
 
 ```{r corporaSummary, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     

@@ -1,15 +1,28 @@
-```{r mkn4Alpha, echo=F, eval=T, message=F, warning=F, cache=T, results='hide'}     
-mkn4Alpha <- mknPipeline(training$alpha, validation, lm$mkn4, coverageTrainingAlpha, regexPatterns, directories)
+```{r preprocessCorpora, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-12), results='hide'}     
+oov <- parallelizeTask(preprocessCorpora, training, validation, test, directories)  
 ```
 
-```{r mkn4Beta, echo=F, eval=T, message=F, warning=F, cache=T, results='hide'}     
-mkn4Beta <- mknPipeline(training$beta, validation, lm$mkn4, coverageTrainingBeta, regexPatterns, directories)
+```{r processCorpora, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
+parallelizeTask(processCorpora, training, validation, test)
 ```
 
-```{r mkn4Gamma, echo=F, eval=T, message=F, warning=F, cache=T, results='hide'}     
-mkn4Gamma <- mknPipeline(training$gamma, validation, lm$mkn4, coverageTrainingGamma, regexPatterns, directories)
+```{r createNGrams, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
+parallelizeTask(createNGrams, training, directories)
 ```
 
-```{r mkn4Delta, echo=F, eval=T, message=F, warning=F, cache=T, results='hide'}     
-mkn4Delta <- mknPipeline(training$alpha, validation, lm$mkn4, coverageTrainingDelta, regexPatterns, directories)
+
+```{r alphaMkn, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
+alphaMkn <- mknPipeline(training$alpha, validation$alpha, lm$mkn,  regexPatterns, directories)
+```
+
+```{r betaMkn, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
+betaMkn <- mknPipeline(training$beta, validation$beta, lm$mkn, regexPatterns, directories)  
+```
+
+```{r gammaMkn, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
+gammaMkn <- mknPipeline(training$gamma, validation$gamma, lm$mkn, regexPatterns, directories)
+```
+
+```{r deltaMkn, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
+deltaMkn <- mknPipeline(training$delta, validation$delta, lm$mkn, regexPatterns, directories)
 ```

@@ -21,7 +21,7 @@ mknInit <- function(mkn, nGrams, regex) {
   message(paste("\nInitializing MKN language model at",startTime))
   
   lapply(seq_along(nGrams), function(x) {
-    message(paste('...initializing', mkn$args$counts[[x]]$fileDesc))
+    message(paste('...initializing', mkn$counts[[x]]$fileDesc))
     
     # Initialize with NGrams
     nGram <- loadObject(nGrams[[x]])
@@ -37,12 +37,12 @@ mknInit <- function(mkn, nGrams, regex) {
       suffix  <- gsub(regex$suffix[[x-1]], "\\1", counts$nGram, perl = TRUE)
       counts[, c('context', 'suffix') := list(context, suffix)]
     }
-    mkn$args$counts[[x]]$data <- counts
-    saveObject(mkn$args$counts[[x]])
+    mkn$counts[[x]]$data <- counts
+    saveObject(mkn$counts[[x]])
   })
 
   # Log Results
-  logR(mkn$args$mName, startTime, mkn$args$directory, 'various')
+  logR(mkn$mName, startTime, mkn$directory, 'various')
   
   # Alert User
   endTime <- Sys.time()

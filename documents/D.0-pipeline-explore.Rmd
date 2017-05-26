@@ -19,7 +19,7 @@ nGramFreqAnalysis <- parallelizeTask(analyzeNGramFrequencies, pilot$nGrams, dire
 nGramCoverage <- parallelizeTask(analyzeNGramCoverage, pilot$nGrams, directories)
 ```
 
-```{r coverageTrainingAlpha, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-7), results='hide'}     
+```{r coverageTrainingAlpha, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-7), results='hide'}          
 coverageTrainingAlpha <- parallelizeTask(analyzeNGramCoverageTraining, training$alpha, validation, test, directories)   
 ```
 

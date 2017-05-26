@@ -18,11 +18,11 @@ mknEstimate <- function(mkn) {
   message(paste('\nEstimating probabilities at ', startTime))
   
   estimate <- function(x) {
-    message(paste('...estimating', mkn$args$counts[[x]]$fileDesc))
+    message(paste('...estimating', mkn$counts[[x]]$fileDesc))
     
     # Load nGrams
-    lower <- loadObject(mkn$args$counts[[x-1]])
-    current <- loadObject(mkn$args$counts[[x]])
+    lower <- loadObject(mkn$counts[[x-1]])
+    current <- loadObject(mkn$counts[[x]])
 
     # Obtain probability for the suffix 
     pSuffix <- lower[,.(nGram, Pmkn)]
@@ -43,19 +43,19 @@ mknEstimate <- function(mkn) {
     for (i in seq_along(current)) set(current, i=which(is.na(current[[i]])), j=i, value=0)
     
     # Save data table
-    mkn$args$counts[[x]]$data <- current
-    saveObject(mkn$args$counts[[x]])
+    mkn$counts[[x]]$data <- current
+    saveObject(mkn$counts[[x]])
     
   }
 
 
-  nGrams <- lapply(seq_along(mkn$args$model), function(x) {
+  nGrams <- lapply(seq_along(mkn$model), function(x) {
     if (x == 1) {
-      message(paste('...estimating', mkn$args$counts[[x]]$fileDesc))
-      current <- loadObject(mkn$args$counts[[x]])
+      message(paste('...estimating', mkn$counts[[x]]$fileDesc))
+      current <- loadObject(mkn$counts[[x]])
       current <- current[, Pmkn := alpha]
-      mkn$args$counts[[x]]$data <- current
-      saveObject(mkn$args$counts[[x]])
+      mkn$counts[[x]]$data <- current
+      saveObject(mkn$counts[[x]])
       
     } else {
       estimate(x)
