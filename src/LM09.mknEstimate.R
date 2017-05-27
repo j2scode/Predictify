@@ -21,21 +21,22 @@
 #' @export
 mknEstimate <- function(mkn, training, test, sents = NULL, directories) {
   
+  memory.limit(20000)
   startTime <- Sys.time()
   message(paste("\nEvaluating performance on ", test$fileDesc, 'at', startTime))
   
   
   # Function that performs the quadgram probability estimate 
-  score <- function(quintgram) {
+  score <- function(quadgram) {
       
     # Calculate unigram probability, p1
-    s <- quintgram[5]
+    s <- quadgram[4]
     n1p <- model[[1]][ nGram == s][,c(cKN, norm)]
     p1 <- as.numeric(n1p[1] / n1p[2]) + 1 / V
     
     # Calculate bigram probability, p2
-    sfx <- paste0(quintgram[4:5], collapse = ' ')
-    cntx <- quintgram[4]
+    sfx <- paste0(quadgram[3:4], collapse = ' ')
+    cntx <- quadgram[3]
     alpha <- max(0,model[[2]][ nGram == sfx][, alpha])
     lambda <- model[[1]][ nGram == cntx][, lambda]
     if (length(lambda) == 0) {
@@ -44,8 +45,8 @@ mknEstimate <- function(mkn, training, test, sents = NULL, directories) {
     p2 <- alpha + lambda * p1
     
     # Calculate trigram probability, p3
-    sfx <- paste0(quintgram[3:5], collapse = ' ')
-    cntx <- paste0(quintgram[3:4], collapse = ' ')
+    sfx <- paste0(quadgram[2:4], collapse = ' ')
+    cntx <- paste0(quadgram[2:3], collapse = ' ')
     alpha <- max(0,model[[3]][ nGram == sfx][, alpha])
     lambda <- model[[2]][ nGram == cntx][, lambda]
     if (length(lambda) == 0) {
@@ -54,8 +55,8 @@ mknEstimate <- function(mkn, training, test, sents = NULL, directories) {
     p3 <- alpha + lambda * p2
     
     # Calculate quadgram probability, p4
-    sfx <- paste0(quintgram[2:5], collapse = ' ')
-    cntx <- paste0(quintgram[2:4], collapse = ' ')
+    sfx <- paste0(quadgram[1:4], collapse = ' ')
+    cntx <- paste0(quadgram[1:3], collapse = ' ')
     alpha <- max(0,model[[4]][ nGram == sfx][, alpha])
     lambda <- model[[3]][ nGram == cntx][, lambda]
     if (length(lambda) == 0) {
@@ -63,23 +64,14 @@ mknEstimate <- function(mkn, training, test, sents = NULL, directories) {
     }
     p4 <- alpha + lambda * p3
     
-    # Calculate quintgram probability, p5
-    sfx <- paste0(quintgram[1:5], collapse = ' ')
-    cntx <- paste0(quintgram[1:4], collapse = ' ')
-    alpha <- max(0,model[[5]][ nGram == sfx][, alpha])
-    lambda <- model[[4]][ nGram == cntx][, lambda]
-    if (length(lambda) == 0) {
-      lambda <- 0.8 * as.numeric(discounts[5,4])
-    }
-    p5 <- alpha + lambda * p4
-    return(log(p5))
+    return(log(p4))
   }
   
   scoreSentence <- function(sentence) {
     tokens <- unlist(quanteda::tokenize(sentence, what = 'word'))
     rbindlist(lapply(seq_along(tokens[1:(length(tokens)-4)]), function(x) {
       nGram <- list()
-      nGram$quintgram <- paste0(tokens[x:(x+4)], collapse = ' ')
+      nGram$quadgram <- paste0(tokens[x:(x+4)], collapse = ' ')
       nGram$logProb <- score(tokens[x:(x+4)])
       nGram
     }))

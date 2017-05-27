@@ -11,8 +11,8 @@ parallelizeTask(createNGrams, training, directories)
 ```
 
 
-```{r alphaMkn, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
-alphaMkn <- mknPipeline(training$alpha, validation$alpha, lm$mkn,  regexPatterns, directories)
+```{r alphaMkn, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}       
+alphaMkn <- mknPipeline(training$alpha, validation$alpha, lm$mkn,  regexPatterns, directories)   
 ```
 
 ```{r betaMkn, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
