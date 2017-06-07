@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "## ---- katz_discount\n\n#==============================================================================#\n#                              katzDiscount                                    #\n#==============================================================================#\n#'  katzDiscount\n#' \n#' This function calculates the discount ratio and katz cound discount\n#' \n#' @param katz - the meta data for the Katz language model\n#' \n#' @author John James\n#' @export\nkatzDiscount <- function(katz) {\n  \n  startTime <- Sys.time()\n  \n  message(paste(\"\\nCalculating Katz Discount Ratio for Katz model at\", startTime))\n  \n  lapply(seq_along(katz$counts), function(x) {\n    message(paste('...calculating Katz Discount Ratio for', katz$counts[[x]]$fileDesc))\n    \n    # Load counts and frequencies of counts\n    current <- loadObject(katz$counts[[x]])\n    freqs <- loadObject(katz$freq[[x]])\n\n    # Calculate discount ratio for r > k\n    k <- 5\n    current[ r > k, dr := 1]\n\n    # Compute r*\n    rStar <- unlist(lapply(seq(1:k), function(s) {\n      rStar <- (s + 1) * freqs[r == (s+1), Nr] / freqs[r == s, Nr]\n      rStar\n    }))\n\n    # Compute expected value component of equation\n    e <- ((k+1) * freqs[r == (k+1), Nr] / freqs[r == 1, Nr])\n    \n    # Compute discount ratio for 1<= r <= 5\n    disc <- unlist(lapply(seq(1:k), function(s) {\n      dr <- ((rStar[s] / s) - e) / (1 - e)\n      dr\n    }))\n    \n    # Populate data table with discount ratio values\n    setkey(current, r)\n    for (i in 1:k) {\n      current <- current[r == as.numeric(i), dr := disc[i]]\n    }\n  \n    # Populate table with drr, the applied discount\n    current <- current[, drr := dr * r]\n    \n    # Save counts\n    katz$counts[[x]]$data <- current\n    saveObject(katz$counts[[x]])\n\n  })\n  \n  # Log Results\n  logR(paste(katz$mName, 'katz-discounts'), startTime, \n       katz$counts[[1]]$directory, 'various')\n  \n  # Alert User\n  endTime <- Sys.time()\n  message(paste0('...Katz Discounts completed at ', endTime))\n  message(paste('...Elapsed time is', round(difftime(endTime, startTime,  units = 'auto'), 2)))\n  \n}\n## ---- end\n#summary <- katzAbsCount(corpora$train$processedData$nGrams$text, lm$katz)",
+    "created" : 1496818620279.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4050029162",
+    "id" : "4B7D3681",
+    "lastKnownWriteTime" : 1496818625,
+    "last_content_update" : 1496818625411,
+    "path" : "~/Data Science/Data Science Projects/PredictifyR-1.0/src/LM13.katzDiscount.R",
+    "project_path" : "src/LM13.katzDiscount.R",
+    "properties" : {
+    },
+    "relative_order" : 7,
+    "source_on_save" : true,
+    "source_window" : "",
+    "type" : "r_source"
+}

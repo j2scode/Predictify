@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "## ---- katz_init\n\n#==============================================================================#\n#                                katzInit                                      #\n#==============================================================================#\n#'  katzInit\n#' \n#' This function initializes the katz unigram, bigram, trigram,and quadgram\n#' tables\n#' \n#' @param katz - the meta data for the Katz language model\n#' @param nGrams - meta data for training N-grams\n#' @param regex - regex patterns\n#' @author John James\n#' @export\nkatzInit <- function(katz, nGrams, regex) {\n  \n  startTime <- Sys.time()\n  \n  message(paste(\"\\nInitializing Katz language model at\",startTime))\n  \n  lapply(seq_along(nGrams), function(x) {\n    message(paste('...initializing', katz$counts[[x]]$fileDesc))\n    \n    # Initialize with NGrams\n    nGram <- loadObject(nGrams[[x]])\n    counts <- data.table(nGram = featnames(nGram), key = 'nGram')\n    \n    # Add Context if x > 1\n    if (x > 1) {\n      context <- gsub(regex$context[[x-1]], \"\\\\1\", counts$nGram, perl = TRUE)\n      counts[, 'context' := context]\n    }\n    katz$counts[[x]]$data <- counts\n    saveObject(katz$counts[[x]])\n  })\n\n  # Log Results\n  logR(katz$mName, startTime, katz$directory, 'various')\n  \n  # Alert User\n  endTime <- Sys.time()\n  message(paste0('Katz Counts initialized at', endTime))\n  message(paste('Elapsed time is', round(difftime(endTime, startTime,  units = 'auto'), 2)))\n  \n}\n## ---- end\n#katzInit(lm$katz$gamma, corpora$training$gamma$nGrams, regexPatterns)",
+    "created" : 1496801832138.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "943622690",
+    "id" : "4F2FA91F",
+    "lastKnownWriteTime" : 1496793101,
+    "last_content_update" : 1496793101,
+    "path" : "~/Data Science/Data Science Projects/PredictifyR-1.0/src/LM11.katzInit.R",
+    "project_path" : "src/LM11.katzInit.R",
+    "properties" : {
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

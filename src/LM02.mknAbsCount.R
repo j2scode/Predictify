@@ -25,28 +25,41 @@ mknAbsCount <- function(mkn, nGrams) {
     message(paste('...calculating counts for', nGrams[[x]]$fileDesc))
     
     # Load N-grams and list the nGrams to keep
-    counts <- loadObject(mkn$counts[[x]])
+    current <- loadObject(mkn$counts[[x]])
+    setkey(current, nGram)
 
     # Get N-Gram counts from N-Gram
-    nGram <- loadObject(nGrams[[x]])
-    kounts <- data.table(nGram = featnames(nGram), 
-                         count = colSums(nGram),
-                         key = 'nGram')
+    currentNGram <- loadObject(nGrams[[x]])
+    counts <- data.table(nGram = featnames(currentNGram), 
+                             count = colSums(currentNGram),
+                             key = 'nGram')
 
     # Merge with counts table
-    counts <- merge(counts, kounts, by='nGram', all.x = TRUE)
+    current <- merge(current, counts, by='nGram', all.x = TRUE)
     
+    # Add in BOS tag counts for highest order context counts(kluge)
+    if (x == mkn$mOrder) {
+      bosGram <- paste0(rep("BOS", x-1), collapse = ' ')
+      setkey(current, context)
+      temp <- current[context == bosGram, c('context', 'count')]
+      bosCounts <- sum(temp[,count], na.rm = TRUE)
+      lower <- loadObject(mkn$counts[[x-1]])
+      lower[nGram == bosGram, count := bosCounts]
+      mkn$counts[[x-1]]$data <- lower
+      saveObject(mkn$counts[[x-1]])
+    }
+     
     # Clear all NA values
-    for (i in seq_along(counts)) set(counts, i=which(is.na(counts[[i]])), j=i, value=0)
+    for (i in seq_along(current)) set(current, i=which(is.na(current[[i]])), j=i, value=0)
     
     # Save counts
-    mkn$counts[[x]]$data <- counts
+    mkn$counts[[x]]$data <- current
     saveObject(mkn$counts[[x]])
     
     # Summarize counts 
     s <- list()
     s$nGram <- mkn$counts[[x]]$fileDesc
-    s$Count <- nfeature(nGram)
+    s$Count <- nfeature(currentNGram)
     s
   }))
   

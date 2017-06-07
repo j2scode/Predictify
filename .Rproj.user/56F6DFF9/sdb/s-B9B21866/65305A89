@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "## ---- katz_abs_counts\n\n#==============================================================================#\n#                                katzAbsCount                                  #\n#==============================================================================#\n#'  katzAbsCount\n#' \n#' This function calculates the absolute counts of each ngram as well as the\n#' frequencies of frequencies of each ngram order.\n#' \n#' @param katz - the meta data for the Katz language model\n#' @param nGrams - the meta data for the processed training set ngrams\n#' @return summaryCounts - the summary counts for each nGram\n#' \n#' @author John James\n#' @export\nkatzAbsCount <- function(katz, nGrams) {\n  \n  startTime <- Sys.time()\n  \n  message(paste(\"\\nCalculating nGram Counts for Katz model at\", startTime))\n  \n  summaryCounts <- rbindlist(lapply(seq_along(nGrams), function(x) {\n    message(paste('...calculating counts for', nGrams[[x]]$fileDesc))\n    \n    # Load N-grams \n    current <- loadObject(katz$counts[[x]])\n    setkey(current, nGram)\n\n    # Get N-Gram counts from N-Gram\n    currentNGram <- loadObject(nGrams[[x]])\n    counts <- data.table(nGram = featnames(currentNGram), \n                             r = colSums(currentNGram),\n                             key = 'nGram')\n\n    # Merge with counts table\n    current <- merge(current, counts, by='nGram', all.x = TRUE)\n\n    # Clear all NA values\n    for (i in seq_along(current)) set(current, i=which(is.na(current[[i]])), j=i, value=0)\n    \n    # Save counts\n    setkey(current, nGram)\n    katz$counts[[x]]$data <- current\n    saveObject(katz$counts[[x]])\n\n    # Calculate frequencies of frequencies and save\n    fof <- table(counts[, r])\n    Nr <- as.integer(fof)\n    r <- as.integer(as.character(names(fof)))\n    freqs <- data.table(r = r, Nr = Nr)\n    \n    # Add frequency of UNK which replaced hapax legomena\n    freqs <- rbindlist(list(freqs, list(1, current[nGram == 'UNK', r])))\n    setkey(freqs, r)\n    katz$freq[[x]]$data <- freqs\n    saveObject(katz$freq[[x]])\n    \n    # Summarize counts \n    s <- list()\n    s$nGram <- katz$counts[[x]]$fileDesc\n    s$Count <- nfeature(currentNGram)\n    s\n  }))\n  \n  # Save Summary counts\n  katz$summary$data <- summaryCounts\n  saveObject(katz$summary)\n\n  # Log Results\n  logR(paste(katz$mName, 'counts'), startTime, \n       katz$counts[[1]]$directory, 'various')\n  \n  # Alert User\n  endTime <- Sys.time()\n  message(paste0('...Katz Absolute Counts completed at ', endTime))\n  message(paste('...Elapsed time is', round(difftime(endTime, startTime,  units = 'auto'), 2)))\n  \n  return(katz$summary$data)\n}\n## ---- end\n#summary <- katzAbsCount(corpora$train$processedData$nGrams$text, lm$katz)",
+    "created" : 1496815104805.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1006110424",
+    "id" : "65305A89",
+    "lastKnownWriteTime" : 1496815843,
+    "last_content_update" : 1496815843333,
+    "path" : "~/Data Science/Data Science Projects/PredictifyR-1.0/src/LM12.katzAbsCount.R",
+    "project_path" : "src/LM12.katzAbsCount.R",
+    "properties" : {
+    },
+    "relative_order" : 8,
+    "source_on_save" : true,
+    "source_window" : "",
+    "type" : "r_source"
+}

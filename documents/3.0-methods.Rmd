@@ -532,7 +532,7 @@ Before the estimation is performed, the language model is compressed by removing
 
 `r figr("mknEvaluate-M", TRUE, type="Table")`: Modified Kneser-Ney Estimations
 ```{r mknEvaluate-M, echo=F, message=FALSE,  eval=T, results='asis', out.width='100%'}
-knitr::include_graphics('../reports/mknEstimate.png')
+knitr::include_graphics('../reports/mknEvaluate.png')
 ```
 
 The unigram estimate is simply the continuation count of the word, normalized by the number of bigrams in the model. $P_{MKN}^{low}(w_i|w_{i-n+1}^{i-1})$ and $P_{MKN}^{high}(w_i|w_{i-n+1}^{i-1})$ are comprised of an alpha probability ($\alpha_{low}$ or $\alpha_{high}$)  plus a lambda weighting factor ($\lambda_{low}$ or $\lambda_{high}$) times the probability of the word $w_i$ with context $w_{i-n+2}^{i-1}$.

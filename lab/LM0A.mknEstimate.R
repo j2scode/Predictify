@@ -1,9 +1,9 @@
 ## ---- mkn_Estimate
 
 #==============================================================================#
-#                                   mknEstimate                                # 
+#                                   mknEvaluate                                # 
 #==============================================================================#
-#'  mknEstimate
+#'  mknEvaluate
 #' 
 #' This function calculates the modified Kneser-Ney estimates for the 
 #' n = 4-gram model
@@ -11,7 +11,7 @@
 #' @param mkn - the model meta data 
 #' @author John James
 #' @export
-mknEstimate <- function(mkn) {
+mknEvaluate <- function(mkn) {
   
   startTime <- Sys.time()
   
@@ -63,7 +63,7 @@ mknEstimate <- function(mkn) {
   })
 
   # Log Results
-  logR('mknEstimate', startTime, ' '  , ' ')
+  logR('mknEvaluate', startTime, ' '  , ' ')
   
   # Alert User
   endTime <- Sys.time()

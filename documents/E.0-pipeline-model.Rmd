@@ -11,18 +11,18 @@ parallelizeTask(createNGrams, training, directories)
 ```
 
 
-```{r alphaMkn, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}       
-alphaMkn <- mknPipeline(training$alpha, validation$alpha, lm$mkn,  regexPatterns, directories)   
+```{r mknTrainAlpha, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}       
+mknPipeline(training$alpha, validation$alpha, lm$mkn$alpha,  regexPatterns, directories)
 ```
 
-```{r betaMkn, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
-betaMkn <- mknPipeline(training$beta, validation$beta, lm$mkn, regexPatterns, directories)  
+```{r mknTrainBeta, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
+mknPipeline(training$beta, validation$beta, lm$mkn$beta, regexPatterns, directories)    
 ```
 
-```{r gammaMkn, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
-gammaMkn <- mknPipeline(training$gamma, validation$gamma, lm$mkn, regexPatterns, directories)
+```{r mknTrainGamma, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
+mknPipeline(training$gamma, validation$gamma, lm$mkn$gamma, regexPatterns, directories)
 ```
 
-```{r deltaMkn, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
-deltaMkn <- mknPipeline(training$delta, validation$delta, lm$mkn, regexPatterns, directories)
+```{r mknTrainDelta, echo=F, eval=T, message=F, warning=F, cache=T, dependson=c(-1), results='hide'}     
+mknPipeline(training$delta, validation$delta, lm$mkn$delta, regexPatterns, directories)
 ```

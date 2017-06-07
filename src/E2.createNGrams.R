@@ -8,7 +8,7 @@
 #' This function prepares the document feature matrices used for language 
 #' modeling
 #' 
-#' @param korpora - the meta data for the processed word and POS data
+#' @param korpora - the meta data for the processed word data
 #' @param directories - the project directory structure
 #' @return nGramSummary - data frame with counts for each n-gram (and type)
 #' @author John James

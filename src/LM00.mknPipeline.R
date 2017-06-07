@@ -39,37 +39,18 @@ mknPipeline <- function(training, test, model, regex, directories) {
   # Calculate discounts
   discounts <- mknDiscount(model)
   
-  # Update models with normalizing factors
-  parallelizeTask(mknNorm, model, model$mOrder)
-  
   # Calculate pseudo probability alpha
   parallelizeTask(mknAlpha, model)
   
   # Compute weighting factor lambda
-  parallelizeTask(mknLambda, model, model$mOrder)
-  
-  # Evaluate Model on Validation Set
-  evaluation <- mknEstimate(model,training$processed[[model$mOrder]],
-                                test$processed[[model$mOrder]],
-                                sents = 1000, directories)
-  
-  # Format evaluation package
-  evalPackage <- list()
-  evalPackage$model = model$mDesc
-  evalPackage$corpus = training$corpusName
-  evalPackage$pct = training$pct
-  evalPackage$eval = evaluation
+  parallelizeTask(mknLambda, model)
 
-  # Save Analysis
-  output <- list()
-  output$directory <- directories$analysisDir
-  output$fileName  <- paste0(sub('\\..*', '', paste0('MKN-analysis-package-')),
-                             training$fileName,
-                             format(Sys.time(),'_%Y%m%d_%H%M%S'), '.Rdata')
-  output$objName   <- 'evalPackage'
-  output$data  <- evalPackage
-  saveObject(output)
-
+  # Compute probabilities 
+  parallelizeTask(mknEstimate, model)
+  
+  # Publish language model
+  parallelizeTask(mknPublish, model, directories)
+  
   # Log Results
   logR('mknPipeline', startTime, '', '')
   
@@ -78,6 +59,5 @@ mknPipeline <- function(training, test, model, regex, directories) {
   message(paste('MKN Pipeline Complete at', endTime))
   message(paste('Elapsed time is', round(difftime(endTime, startTime,  units = 'auto'), 2)))
   
-  return(evalPackage)
 }
 ## ---- end

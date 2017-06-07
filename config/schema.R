@@ -715,40 +715,289 @@ corpora = list(
 
 
 lm <- list(
+  katz = list(
+    alpha = list(
+      mName = 'KatzAlpha',
+      mDesc = 'Katz Model Alpha',
+      mOrder = 4,
+      directory = file.path(directories$lm, 'katz', 'alpha'),
+      summary = list(
+        directory = file.path(directories$lm, 'katz', 'alpha'),
+        fileDesc = 'Katz N-Gram Count Summary',
+        fileName = 'katz-ngram-count-summary.Rdata',
+        objName  = 'katzNGramCountSummary'
+      ),
+      freq = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'katz', 'alpha', 'freq')
+        nGram$objName  <- paste0('katz', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('katz-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('Katz ', quadGrams[[n]]$fileDesc)
+        nGram
+      }),
+      counts = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'katz', 'alpha', 'counts')
+        nGram$objName  <- paste0('katz', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('katz-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('Katz ', quadGrams[[n]]$fileDesc)
+        nGram
+      }),
+      model = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'katz', 'alpha', 'model')
+        nGram$objName  <- paste0('katz', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('katz-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('Katz ', quadGrams[[n]]$fileDesc)
+        nGram
+      })
+    ),
+    beta = list(
+      mName = 'KatzBeta',
+      mDesc = 'Katz Model Beta',
+      mOrder = 4,
+      directory = file.path(directories$lm, 'katz', 'beta'),
+      summary = list(
+        directory = file.path(directories$lm, 'katz', 'beta'),
+        fileDesc = 'Katz N-Gram Count Summary',
+        fileName = 'katz-ngram-count-summary.Rdata',
+        objName  = 'katzNGramCountSummary'
+      ),
+      freq = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'katz', 'beta', 'freq')
+        nGram$objName  <- paste0('katz', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('katz-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('Katz ', quadGrams[[n]]$fileDesc)
+        nGram
+      }),
+      counts = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'katz', 'beta', 'counts')
+        nGram$objName  <- paste0('katz', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('katz-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('Katz ', quadGrams[[n]]$fileDesc)
+        nGram
+      }),
+      model = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'katz', 'beta', 'model')
+        nGram$objName  <- paste0('katz', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('katz-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('Katz ', quadGrams[[n]]$fileDesc)
+        nGram
+      })
+    ),
+    gamma = list(
+      mName = 'KatzGamma',
+      mDesc = 'Katz Model Gamma',
+      mOrder = 4,
+      directory = file.path(directories$lm, 'katz', 'gamma'),
+      summary = list(
+        directory = file.path(directories$lm, 'katz', 'gamma'),
+        fileDesc = 'Katz N-Gram Count Summary',
+        fileName = 'katz-ngram-count-summary.Rdata',
+        objName  = 'katzNGramCountSummary'
+      ),
+      freq = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'katz', 'gamma', 'freq')
+        nGram$objName  <- paste0('katz', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('katz-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('Katz ', quadGrams[[n]]$fileDesc)
+        nGram
+      }),
+      counts = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'katz', 'gamma', 'counts')
+        nGram$objName  <- paste0('katz', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('katz-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('Katz ', quadGrams[[n]]$fileDesc)
+        nGram
+      }),
+      model = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'katz', 'gamma', 'model')
+        nGram$objName  <- paste0('katz', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('katz-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('Katz ', quadGrams[[n]]$fileDesc)
+        nGram
+      })
+    ),
+    delta = list(
+      mName = 'KatzDelta',
+      mDesc = 'Katz Model Delta',
+      mOrder = 4,
+      directory = file.path(directories$lm, 'katz', 'delta'),
+      summary = list(
+        directory = file.path(directories$lm, 'katz', 'delta'),
+        fileDesc = 'Katz N-Gram Count Summary',
+        fileName = 'katz-ngram-count-summary.Rdata',
+        objName  = 'katzNGramCountSummary'
+      ),
+      freq = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'katz', 'delta', 'freq')
+        nGram$objName  <- paste0('katz', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('katz-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('Katz ', quadGrams[[n]]$fileDesc)
+        nGram
+      }),
+      counts = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'katz', 'delta', 'counts')
+        nGram$objName  <- paste0('katz', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('katz-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('Katz ', quadGrams[[n]]$fileDesc)
+        nGram
+      }),
+      model = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'katz', 'delta', 'model')
+        nGram$objName  <- paste0('katz', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('katz-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('Katz ', quadGrams[[n]]$fileDesc)
+        nGram
+      })
+    )
+  ),# end of katz
   mkn = list(
-    mName = 'MKN',
-    mDesc = 'MKN Model',
-    mOrder = 4,
-    directory = file.path(directories$lm, 'mkn'),
-    regex = regexPatterns,
-    summary = list(
-      directory = file.path(directories$lm, 'mkn'),
-      fileDesc = 'MKN N-Gram Count Summary',
-      fileName = 'mkn-ngram-count-summary.Rdata',
-      objName  = 'mknNGramCountSummary'
+    alpha = list(
+      mName = 'MKNAlpha',
+      mDesc = 'MKN Model Alpha',
+      mOrder = 4,
+      directory = file.path(directories$lm, 'mkn', 'alpha'),
+      summary = list(
+        directory = file.path(directories$lm, 'mkn', 'alpha'),
+        fileDesc = 'MKN N-Gram Count Summary',
+        fileName = 'mkn-ngram-count-summary.Rdata',
+        objName  = 'mknNGramCountSummary'
+      ),
+      discounts = list(
+        directory = file.path(directories$lm, 'mkn', 'alpha'),
+        fileDesc = 'MKN Discounts',
+        fileName = 'mkn-discounts.Rdata',
+        objName  = 'mknDiscounts'
+      ),
+      counts = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'mkn', 'alpha', 'counts')
+        nGram$objName  <- paste0('mkn', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('mkn-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('MKN ', quadGrams[[n]]$fileDesc)
+        nGram
+      }),
+      model = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'mkn', 'alpha', 'model')
+        nGram$objName  <- paste0('mkn', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('mkn-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('MKN ', quadGrams[[n]]$fileDesc)
+        nGram
+      })
     ),
-    discounts = list(
-      directory = file.path(directories$lm, 'mkn'),
-      fileDesc = 'MKN Discounts',
-      fileName = 'mkn-discounts.Rdata',
-      objName  = 'mknDiscounts'
+    beta = list(
+      mName = 'MKNBeta',
+      mDesc = 'MKN Model Beta',
+      mOrder = 4,
+      directory = file.path(directories$lm, 'mkn', 'beta'),
+      summary = list(
+        directory = file.path(directories$lm, 'mkn', 'beta'),
+        fileDesc = 'MKN N-Gram Count Summary',
+        fileName = 'mkn-ngram-count-summary.Rdata',
+        objName  = 'mknNGramCountSummary'
+      ),
+      discounts = list(
+        directory = file.path(directories$lm, 'mkn', 'beta'),
+        fileDesc = 'MKN Discounts',
+        fileName = 'mkn-discounts.Rdata',
+        objName  = 'mknDiscounts'
+      ),
+      counts = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'mkn', 'beta', 'counts')
+        nGram$objName  <- paste0('mkn', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('mkn-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('MKN ', quadGrams[[n]]$fileDesc)
+        nGram
+      }),
+      model = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'mkn', 'beta', 'model')
+        nGram$objName  <- paste0('mkn', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('mkn-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('MKN ', quadGrams[[n]]$fileDesc)
+        nGram
+      })
     ),
-    counts = lapply(seq_along(quadGrams), function(n) {
-      nGram = list()
-      nGram$directory <- file.path(directories$lm, 'mkn', 'counts')
-      nGram$objName  <- paste0('mkn', quadGrams[[n]]$fileDesc)
-      nGram$fileName <- paste0('mkn-', quadGrams[[n]]$fileName)
-      nGram$fileDesc <- paste0('MKN ', quadGrams[[n]]$fileDesc)
-      nGram
-    }),
-    model = lapply(seq_along(quadGrams), function(n) {
-      nGram = list()
-      nGram$directory <- file.path(directories$lm, 'mkn', 'model')
-      nGram$objName  <- paste0('mkn', quadGrams[[n]]$fileDesc)
-      nGram$fileName <- paste0('mkn-', quadGrams[[n]]$fileName)
-      nGram$fileDesc <- paste0('MKN ', quadGrams[[n]]$fileDesc)
-      nGram
-    })
+    gamma = list(
+      mName = 'MKNGamma',
+      mDesc = 'MKN Model Gamma',
+      mOrder = 4,
+      directory = file.path(directories$lm, 'mkn', 'gamma'),
+      summary = list(
+        directory = file.path(directories$lm, 'mkn', 'gamma'),
+        fileDesc = 'MKN N-Gram Count Summary',
+        fileName = 'mkn-ngram-count-summary.Rdata',
+        objName  = 'mknNGramCountSummary'
+      ),
+      discounts = list(
+        directory = file.path(directories$lm, 'mkn', 'gamma'),
+        fileDesc = 'MKN Discounts',
+        fileName = 'mkn-discounts.Rdata',
+        objName  = 'mknDiscounts'
+      ),
+      counts = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'mkn', 'gamma', 'counts')
+        nGram$objName  <- paste0('mkn', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('mkn-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('MKN ', quadGrams[[n]]$fileDesc)
+        nGram
+      }),
+      model = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'mkn', 'gamma', 'model')
+        nGram$objName  <- paste0('mkn', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('mkn-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('MKN ', quadGrams[[n]]$fileDesc)
+        nGram
+      })
+    ),
+    delta = list(
+      mName = 'MKNDelta',
+      mDesc = 'MKN Model Delta',
+      mOrder = 4,
+      directory = file.path(directories$lm, 'mkn', 'delta'),
+      summary = list(
+        directory = file.path(directories$lm, 'mkn', 'delta'),
+        fileDesc = 'MKN N-Gram Count Summary',
+        fileName = 'mkn-ngram-count-summary.Rdata',
+        objName  = 'mknNGramCountSummary'
+      ),
+      discounts = list(
+        directory = file.path(directories$lm, 'mkn', 'delta'),
+        fileDesc = 'MKN Discounts',
+        fileName = 'mkn-discounts.Rdata',
+        objName  = 'mknDiscounts'
+      ),
+      counts = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'mkn', 'delta', 'counts')
+        nGram$objName  <- paste0('mkn', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('mkn-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('MKN ', quadGrams[[n]]$fileDesc)
+        nGram
+      }),
+      model = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'mkn', 'delta', 'model')
+        nGram$objName  <- paste0('mkn', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('mkn-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('MKN ', quadGrams[[n]]$fileDesc)
+        nGram
+      })
+    )
   )# end of mkn
 )
 

@@ -51,4 +51,4 @@ mknInit <- function(mkn, nGrams, regex) {
   
 }
 ## ---- end
-#mknInit(lm$mkn, regexPatterns)
+#mknInit(lm$mkn$gamma, corpora$training$gamma$nGrams, regexPatterns)

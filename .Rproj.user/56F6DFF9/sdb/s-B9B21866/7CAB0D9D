@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "## ---- katz_pipeline\n\n#------------------------------------------------------------------------------#\n#                               katzPipeline                                   #\n#------------------------------------------------------------------------------#\n#'  katzPipeline  \n#' \n#' This function executes the pipeline for the katz-backoff quadgram model.\n#' \n#' \n#' @param training - the meta data for the training set being modeled\n#' @param test - the meta data for the test set \n#' @param model - the meta data for the model\n#' @param regex - the regex patterns\n#' @param directories - the project directory structure\n#' @author John James\n#' @export\nkatzPipeline <- function(training, test, model, regex, directories) {\n  \n  startTime <- Sys.time()\n  message(paste('\\nExecuting', model$mDesc, 'on',\n                training$corpusName, 'at', startTime))\n  \n  gc()\n  \n  # Initialize Katz Tables\n  katzInit(model, training$nGrams, regex)\n  \n  # Calculate absolute counts\n  summaryCounts <- katzAbsCount(model, training$nGrams)\n  \n  # Calculate Discounts\n  katzDiscount(model)\n\n  # Log Results\n  logR('mknPipeline', startTime, '', '')\n  \n  # Alert User\n  endTime <- Sys.time()\n  message(paste('MKN Pipeline Complete at', endTime))\n  message(paste('Elapsed time is', round(difftime(endTime, startTime,  units = 'auto'), 2)))\n  \n}\n## ---- end\n",
+    "created" : 1496791868508.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2410237061",
+    "id" : "7CAB0D9D",
+    "lastKnownWriteTime" : 1496818689,
+    "last_content_update" : 1496818689124,
+    "path" : "~/Data Science/Data Science Projects/PredictifyR-1.0/src/LM10.katzPipeline.R",
+    "project_path" : "src/LM10.katzPipeline.R",
+    "properties" : {
+        "source_window_id" : ""
+    },
+    "relative_order" : 2,
+    "source_on_save" : true,
+    "source_window" : "",
+    "type" : "r_source"
+}
