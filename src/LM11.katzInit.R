@@ -26,10 +26,13 @@ katzInit <- function(katz, nGrams, regex) {
     nGram <- loadObject(nGrams[[x]])
     counts <- data.table(nGram = featnames(nGram), key = 'nGram')
     
-    # Add Context if x > 1
+    # Add Context, Suffix, and last word if x > 1
     if (x > 1) {
       context <- gsub(regex$context[[x-1]], "\\1", counts$nGram, perl = TRUE)
+      suffix <- gsub(regex$suffix[[x-1]], "\\1", counts$nGram, perl = TRUE)
       counts[, 'context' := context]
+      counts[, 'suffix' := suffix]
+
     }
     katz$counts[[x]]$data <- counts
     saveObject(katz$counts[[x]])

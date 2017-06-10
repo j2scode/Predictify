@@ -31,17 +31,16 @@ regexPatterns = list(
   singles         = '\\b[b-hj-z]{1}\\b',
   whiteSpace      = "\\s+",
   abbreviations   = "(?:[a-zA-Z]\\.){2,}",
+  lastWord        = "[\\w']+$",
   context = list(
     bigrams   = "^((\\S+\\s+){0}\\S+).*$",
     trigrams  = "^((\\S+\\s+){1}\\S+).*$",
-    quadgrams = "^((\\S+\\s+){2}\\S+).*$",
-    quadGrams = "^((\\S+\\s+){3}\\S+).*$"
+    quadgrams = "^((\\S+\\s+){2}\\S+).*$"
   ),
   suffix = list(
     bigrams = "^.*\\s+((?:\\S+\\s+){0}\\S+)$",
     trigrams = "^.*\\s+((?:\\S+\\s+){1}\\S+)$",
-    quadgrams = "^.*\\s+((?:\\S+\\s+){2}\\S+)$",
-    quadGrams = "^.*\\s+((?:\\S+\\s+){3}\\S+)$"
+    quadgrams = "^.*\\s+((?:\\S+\\s+){2}\\S+)$"
   )
 ) # end of regexPatterns
 

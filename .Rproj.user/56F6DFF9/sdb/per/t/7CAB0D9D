@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "## ---- katz_pipeline\n\n#------------------------------------------------------------------------------#\n#                               katzPipeline                                   #\n#------------------------------------------------------------------------------#\n#'  katzPipeline  \n#' \n#' This function executes the pipeline for the katz-backoff quadgram katz.\n#'  \n#' @param training - the meta data for the training set being katzed\n#' @param test - the meta data for the test set \n#' @param katz - the meta data for the katz language model\n#' @param regex - the regex patterns\n#' @param directories - the project directory structure\n#' @author John James\n#' @export\nkatzPipeline <- function(training, test, katz, regex, directories) {\n  \n  startTime <- Sys.time()\n  message(paste('\\nExecuting', katz$mDesc, 'on',\n                training$corpusName, 'at', startTime))\n  \n  # Meta data for test corpus and ngrams\n  korpus <- lapply(seq(1:4), function(n) {\n    nGram = list()\n    nGram$directory <- file.path(directories$testingDir, 'katz', 'corpus')\n    nGram$objName  <- paste0('ltcorpus', n)\n    nGram$fileName <- paste0('ltcorpus', n, '.txt')\n    nGram \n  })\n  \n  nGrams <- lapply(seq(1:4), function(n) {\n    nGram = list()\n    nGram$directory <- file.path(directories$testingDir, 'katz', 'nGrams')\n    nGram$objName  <- paste0('ltcorpus', n)\n    nGram$fileName <- paste0('ltcorpus', n, '.RData')\n    nGram \n  })\n  \n  test <- list(\n    directory = file.path(directories$testingDir, 'katz', 'test'),\n    objName = 'katzTestData',\n    fileName = 'test.txt'\n  )\n  \n  # Initialize Katz Tables\n  katzInit(katz, nGrams, regex)\n  \n  # Calculate absolute counts\n  #summaryCounts <- katzAbsCount(katz, training$nGrams)\n  summaryCounts <- katzAbsCount(katz, nGrams)\n  \n  # Calculate Adjusted Counts\n  summaryCounts <- katzAdjCount(katz, discount = 0.5, directories)\n  \n  # Calculate alpha weights\n  katzAlpha(katz)\n  \n  # Prune and publish language model\n  modelSize <- katzPrune(katz, directories)\n  \n  # Evaluate language model\n  evaluation <- katzEvaluate(katz, training, test, sents = NULL, directories)\n  \n  \n  # Log Results\n  logR('katzPipeline', startTime, '', '')\n  \n  # Alert User\n  endTime <- Sys.time()\n  message(paste('Katz Pipeline Complete at', endTime))\n  message(paste('Elapsed time is', round(difftime(endTime, startTime,  units = 'auto'), 2)))\n  \n}\n## ---- end\n",
+    "created" : 1496791868508.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2637881581",
+    "id" : "7CAB0D9D",
+    "lastKnownWriteTime" : 1497113206,
+    "last_content_update" : 1497113206261,
+    "path" : "~/Data Science/Data Science Projects/PredictifyR-1.0/src/LM10.katzPipeline.R",
+    "project_path" : "src/LM10.katzPipeline.R",
+    "properties" : {
+        "source_window_id" : ""
+    },
+    "relative_order" : 2,
+    "source_on_save" : true,
+    "source_window" : "",
+    "type" : "r_source"
+}

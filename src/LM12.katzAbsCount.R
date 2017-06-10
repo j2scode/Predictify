@@ -35,6 +35,11 @@ katzAbsCount <- function(katz, nGrams) {
 
     # Merge with counts table
     current <- merge(current, counts, by='nGram', all.x = TRUE)
+    
+    # Compute context counts
+    if (x > 1) {
+       current[, cContext := sum(r), by = context]
+    }
 
     # Clear all NA values
     for (i in seq_along(current)) set(current, i=which(is.na(current[[i]])), j=i, value=0)
@@ -44,14 +49,20 @@ katzAbsCount <- function(katz, nGrams) {
     katz$counts[[x]]$data <- current
     saveObject(katz$counts[[x]])
 
-    # Calculate frequencies of frequencies and save
+    # Calculate frequencies of frequencies 
     fof <- table(counts[, r])
     Nr <- as.integer(fof)
     r <- as.integer(as.character(names(fof)))
     freqs <- data.table(r = r, Nr = Nr)
     
-    # Add frequency of UNK which replaced hapax legomena
-    freqs <- rbindlist(list(freqs, list(1, current[nGram == 'UNK', r])))
+    # Add frequency of UNK which replaced hapax legomena for unigrams
+    if (x == 1) {
+      if (nrow(current[nGram == 'UNK']) > 0 ) {
+        freqs <- rbindlist(list(freqs, list(1, current[nGram == 'UNK', r])))
+      }
+    }
+    
+    # Save frequencies of frequencies
     setkey(freqs, r)
     katz$freq[[x]]$data <- freqs
     saveObject(katz$freq[[x]])
@@ -59,6 +70,7 @@ katzAbsCount <- function(katz, nGrams) {
     # Summarize counts 
     s <- list()
     s$nGram <- katz$counts[[x]]$fileDesc
+    s$mOrder <- x
     s$Count <- nfeature(currentNGram)
     s
   }))
@@ -76,7 +88,7 @@ katzAbsCount <- function(katz, nGrams) {
   message(paste0('...Katz Absolute Counts completed at ', endTime))
   message(paste('...Elapsed time is', round(difftime(endTime, startTime,  units = 'auto'), 2)))
   
-  return(katz$summary$data)
+  return(summaryCounts)
 }
 ## ---- end
 #summary <- katzAbsCount(corpora$train$processedData$nGrams$text, lm$katz)
