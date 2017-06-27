@@ -20,9 +20,11 @@ mknPublish <- function(mkn, directories) {
     message(paste('...publishing', mkn$counts[[x]]$fileDesc))
     counts <- loadObject(mkn$counts[[x]])
     if (x == 1) {
-      model <- counts[, c('nGram', 'count', 'Pmkn')]
+      model <- counts[, c('nGram', 'count', 'Pmkn', 'lambda', 'alpha')]
+    } else if (x < mkn$mOrder) {
+      model <- counts[, c('nGram', 'context', 'count', 'Pmkn', 'lambda', 'alpha')]
     } else {
-      model <- counts[, c('nGram', 'context', 'count', 'Pmkn')]
+      model <- counts[, c('nGram', 'context', 'count', 'Pmkn', 'alpha')]
     }
     setkey(model, nGram)
     mkn$model[[x]]$data <- model

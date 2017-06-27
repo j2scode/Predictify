@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "## ---- mkn_pipeline\n\n#------------------------------------------------------------------------------#\n#                               mknPipeline                                    #\n#------------------------------------------------------------------------------#\n#'  mknPipeline  \n#' \n#' This function executes the pipeline for the Modified Kneser-Ney Trigram\n#' and Quadgram Models.  It processes training corpora of various sizes and \n#' reports the perplexity of the designated test set. \n#' \n#' @param training - the meta data for the training set being mkned\n#' @param test - the meta data for the test set \n#' @param mkn - the meta data for the mkn\n#' @param regex - the regex patterns\n#' @param directories - the project directory structure\n#' @author John James\n#' @export\nmknPipeline <- function(training, test, mkn, regex, directories) {\n  \n  startTime <- Sys.time()\n  message(paste('\\nExecuting', mkn$mDesc, 'on',\n                training$corpusName, 'at', startTime))\n  \n  gc()\n  \n  # Get Test NGrams\n  createTestNGrams(directories)\n  \n  # Initialize MKN language mkn\n  mknInit(mkn, training$nGrams, regex)\n  \n  # Create absolute counts of each nGram\n  features <- parallelizeTask(mknAbsCount, mkn, training$nGrams)\n  \n  # Create continuation counts of each nGram\n  parallelizeTask(mknCKN, mkn, mkn$mOrder)\n  \n  # Count nGram histories\n  parallelizeTask(mknHistories, mkn, mkn$mOrder)\n  \n  # Calculate discounts\n  discounts <- mknDiscount(mkn)\n  \n  # Calculate pseudo probability alpha\n  parallelizeTask(mknAlpha, mkn)\n  \n  # Compute weighting factor lambda\n  parallelizeTask(mknLambda, mkn)\n\n  # Compute probabilities \n  parallelizeTask(mknEstimate, mkn)\n  \n  # Publish language mkn\n  parallelizeTask(mknPublish, mkn, directories)\n  \n  # Evaluate Model\n  pp <- mknEvaluate(lm$mkn$epsilon, corpora$training$epsilon,  corpora$validation$epsilon, sents = NULL, directories)\n  \n  # Log Results\n  logR('mknPipeline', startTime, '', '')\n  \n  # Alert User\n  endTime <- Sys.time()\n  message(paste('MKN Pipeline Complete at', endTime))\n  message(paste('Elapsed time is', round(difftime(endTime, startTime,  units = 'auto'), 2)))\n  \n}\n## ---- end\n\n",
+    "created" : 1498516604718.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1266917139",
+    "id" : "74B0A010",
+    "lastKnownWriteTime" : 1498547775,
+    "last_content_update" : 1498547775579,
+    "path" : "~/Data Science/Data Science Projects/PredictifyR-1.0/src/LM00.mknPipeline.R",
+    "project_path" : "src/LM00.mknPipeline.R",
+    "properties" : {
+        "source_window_id" : ""
+    },
+    "relative_order" : 1,
+    "source_on_save" : true,
+    "source_window" : "",
+    "type" : "r_source"
+}

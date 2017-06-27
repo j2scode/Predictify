@@ -9,47 +9,53 @@
 #' and Quadgram Models.  It processes training corpora of various sizes and 
 #' reports the perplexity of the designated test set. 
 #' 
-#' @param training - the meta data for the training set being modeled
+#' @param training - the meta data for the training set being mkned
 #' @param test - the meta data for the test set 
-#' @param model - the meta data for the model
+#' @param mkn - the meta data for the mkn
 #' @param regex - the regex patterns
 #' @param directories - the project directory structure
 #' @author John James
 #' @export
-mknPipeline <- function(training, test, model, regex, directories) {
+mknPipeline <- function(training, test, mkn, regex, directories) {
   
   startTime <- Sys.time()
-  message(paste('\nExecuting', model$mDesc, 'on',
+  message(paste('\nExecuting', mkn$mDesc, 'on',
                 training$corpusName, 'at', startTime))
   
   gc()
   
-  # Initialize MKN language model
-  mknInit(model, training$nGrams, regex)
+  # Get Test NGrams
+  createTestNGrams(directories)
+  
+  # Initialize MKN language mkn
+  mknInit(mkn, training$nGrams, regex)
   
   # Create absolute counts of each nGram
-  features <- parallelizeTask(mknAbsCount, model, training$nGrams)
+  features <- parallelizeTask(mknAbsCount, mkn, training$nGrams)
   
   # Create continuation counts of each nGram
-  parallelizeTask(mknCKN, model, model$mOrder)
+  parallelizeTask(mknCKN, mkn, mkn$mOrder)
   
   # Count nGram histories
-  parallelizeTask(mknHistories, model, model$mOrder)
+  parallelizeTask(mknHistories, mkn, mkn$mOrder)
   
   # Calculate discounts
-  discounts <- mknDiscount(model)
+  discounts <- mknDiscount(mkn)
   
   # Calculate pseudo probability alpha
-  parallelizeTask(mknAlpha, model)
+  parallelizeTask(mknAlpha, mkn)
   
   # Compute weighting factor lambda
-  parallelizeTask(mknLambda, model)
+  parallelizeTask(mknLambda, mkn)
 
   # Compute probabilities 
-  parallelizeTask(mknEstimate, model)
+  parallelizeTask(mknEstimate, mkn)
   
-  # Publish language model
-  parallelizeTask(mknPublish, model, directories)
+  # Publish language mkn
+  parallelizeTask(mknPublish, mkn, directories)
+  
+  # Evaluate Model
+  pp <- mknEvaluate(lm$mkn$epsilon, corpora$training$epsilon,  corpora$validation$epsilon, sents = NULL, directories)
   
   # Log Results
   logR('mknPipeline', startTime, '', '')
@@ -61,3 +67,4 @@ mknPipeline <- function(training, test, model, regex, directories) {
   
 }
 ## ---- end
+

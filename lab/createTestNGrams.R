@@ -14,7 +14,7 @@ createTestNGrams <- function(directories) {
   
   korpus <- lapply(seq(1:4), function(n) {
       nGram = list()
-      nGram$directory <- file.path(directories$testingDir, 'katz', 'corpus')
+      nGram$directory <- file.path(directories$testingDir, 'mkn', 'corpus')
       nGram$objName  <- paste0('ltcorpus', n)
       nGram$fileName <- paste0('ltcorpus', n, '.txt')
       nGram 
@@ -22,7 +22,7 @@ createTestNGrams <- function(directories) {
   
   nGrams <- lapply(seq(1:4), function(n) {
     nGram = list()
-    nGram$directory <- file.path(directories$testingDir, 'katz', 'nGrams')
+    nGram$directory <- file.path(directories$testingDir, 'mkn', 'nGrams')
     nGram$objName  <- paste0('ltcorpus', n)
     nGram$fileName <- paste0('ltcorpus', n, '.RData')
     nGram 

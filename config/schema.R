@@ -460,6 +460,24 @@ corpora = list(
         nGram$fileDesc <- quadGrams[[n]]$fileDesc
         nGram
       })
+    ),
+    epsilon = list(
+      processed = lapply(seq(1:4), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$testingDir, 'mkn', 'corpus')
+        nGram$objName  <- paste0('ltcorpus', n)
+        nGram$fileName <- paste0('ltcorpus', n, '.txt')
+        nGram$fileDesc <- paste0('ltcorpus', n)
+        nGram 
+      }),
+      nGrams = lapply(seq(1:4), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$testingDir, 'mkn', 'nGrams')
+        nGram$objName  <- paste0('ltcorpus', n)
+        nGram$fileName <- paste0('ltcorpus', n, '.RData')
+        nGram$fileDesc <- paste0('ltcorpus', n)
+        nGram 
+      })
     )
   ), # end of training
   validation = list(
@@ -582,6 +600,11 @@ corpora = list(
         nGram$fileDesc <- quadGrams[[n]]$fileDesc
         nGram
       })
+    ),
+    epsilon = list(
+      directory = file.path(directories$testingDir, 'mkn', 'test'),
+      fileName = 'test.txt',
+      objName = 'test'
     )
   ), # end of validation
   test = list(
@@ -996,6 +1019,40 @@ lm <- list(
         nGram$fileDesc <- paste0('MKN ', quadGrams[[n]]$fileDesc)
         nGram
       })
+    ),
+    epsilon = list(
+      mName = 'MKNEpsilon',
+      mDesc = 'MKN Model Epsilon',
+      mOrder = 4,
+      directory = file.path(directories$lm, 'mkn', 'epsilon'),
+      summary = list(
+        directory = file.path(directories$lm, 'mkn', 'epsilon'),
+        fileDesc = 'MKN N-Gram Count Summary',
+        fileName = 'mkn-ngram-count-summary.Rdata',
+        objName  = 'mknNGramCountSummary'
+      ),
+      discounts = list(
+        directory = file.path(directories$lm, 'mkn', 'epsilon'),
+        fileDesc = 'MKN Discounts',
+        fileName = 'mkn-discounts.Rdata',
+        objName  = 'mknDiscounts'
+      ),
+      counts = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'mkn', 'epsilon', 'counts')
+        nGram$objName  <- paste0('mkn', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('mkn-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('MKN ', quadGrams[[n]]$fileDesc)
+        nGram
+      }),
+      model = lapply(seq_along(quadGrams), function(n) {
+        nGram = list()
+        nGram$directory <- file.path(directories$lm, 'mkn', 'epsilon', 'model')
+        nGram$objName  <- paste0('mkn', quadGrams[[n]]$fileDesc)
+        nGram$fileName <- paste0('mkn-', quadGrams[[n]]$fileName)
+        nGram$fileDesc <- paste0('MKN ', quadGrams[[n]]$fileDesc)
+        nGram
+      })
     )
   )# end of mkn
 )
@@ -1003,7 +1060,7 @@ lm <- list(
 dependencies <- list(
   rPackages = list('data.table', 'doParallel', 'fastmatch', 'kfigr', 'knitr',
                    'ggplot2', 'ggthemes', 'gridExtra', 'lsa', 'languageR', 'jpeg',
-                   'qdapDictionaries', 'qdapRegex', 'qdapTools', 'qdap',
+                   'qdapDictionaries', 'qdapRegex', 'qdapTools', 'gdata', 'qdap',
                    'NLP', 'openNLP', 'pbapply', 'plotly', 'quanteda', 'RCurl', 
                    'reshape2', 'stringr', 'tools', 'tm', 'wordcloud', 'zipfR')
                        

@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "## ---- mkn_counts\n\n#==============================================================================#\n#                                mknAbsCount                                   #\n#==============================================================================#\n#'  mknAbsCount\n#' \n#' This function takes as its parameter, the meta data for the processed \n#' training ngram the mkn lm, then calculates raw counts for each ngram \n#' in separate data tables and saves to disc. Total counts for each ngram are\n#' summarized, stored to disc and returned to the calling environment\n#' \n#' @param mkn - the meta data for the MKN language model\n#' @param nGrams - the meta data for the processed training set ngrams\n#' @return summaryCounts - the summary counts for each nGram\n#' @author John James\n#' @export\nmknAbsCount <- function(mkn, nGrams) {\n  \n  startTime <- Sys.time()\n  \n  message(paste(\"\\nCalculating nGram Counts for MKN model at\", startTime))\n  \n  summaryCounts <- rbindlist(lapply(seq_along(nGrams), function(x) {\n    message(paste('...calculating counts for', nGrams[[x]]$fileDesc))\n    \n    # Load N-grams and list the nGrams to keep\n    current <- loadObject(mkn$counts[[x]])\n    setkey(current, nGram)\n\n    # Get N-Gram counts from N-Gram\n    currentNGram <- loadObject(nGrams[[x]])\n    counts <- data.table(nGram = featnames(currentNGram), \n                             count = colSums(currentNGram),\n                             key = 'nGram')\n\n    # Merge with counts table\n    current <- merge(current, counts, by='nGram', all.x = TRUE)\n    \n    # Clear all NA values\n    for (i in seq_along(current)) set(current, i=which(is.na(current[[i]])), j=i, value=0)\n    \n    # Save counts\n    mkn$counts[[x]]$data <- current\n    saveObject(mkn$counts[[x]])\n    \n    # Summarize counts \n    s <- list()\n    s$nGram <- mkn$counts[[x]]$fileDesc\n    s$Count <- nfeature(currentNGram)\n    s\n  }))\n  \n  # Save Summary counts\n  mkn$summary$data <- summaryCounts\n  saveObject(mkn$summary)\n\n  # Log Results\n  logR(paste(mkn$mName, 'counts'), startTime, \n       mkn$counts[[1]]$directory, 'various')\n  \n  # Alert User\n  endTime <- Sys.time()\n  message(paste0('...MKN Counts completed at ', endTime))\n  message(paste('...Elapsed time is', round(difftime(endTime, startTime,  units = 'auto'), 2)))\n  \n  return(mkn$summary$data)\n}\n## ---- end\n#summary <- mknAbsCount(corpora$train$processedData$nGrams$text, lm$mkn)",
+    "created" : 1498575226448.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1109726598",
+    "id" : "B0E589C3",
+    "lastKnownWriteTime" : 1498577796,
+    "last_content_update" : 1498577796394,
+    "path" : "~/Data Science/Data Science Projects/PredictifyR-1.0/src/LM02.mknAbsCount.R",
+    "project_path" : "src/LM02.mknAbsCount.R",
+    "properties" : {
+    },
+    "relative_order" : 4,
+    "source_on_save" : true,
+    "source_window" : "",
+    "type" : "r_source"
+}

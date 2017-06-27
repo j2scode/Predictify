@@ -37,18 +37,6 @@ mknAbsCount <- function(mkn, nGrams) {
     # Merge with counts table
     current <- merge(current, counts, by='nGram', all.x = TRUE)
     
-    # Add in BOS tag counts for highest order context counts(kluge)
-    if (x == mkn$mOrder) {
-      bosGram <- paste0(rep("BOS", x-1), collapse = ' ')
-      setkey(current, context)
-      temp <- current[context == bosGram, c('context', 'count')]
-      bosCounts <- sum(temp[,count], na.rm = TRUE)
-      lower <- loadObject(mkn$counts[[x-1]])
-      lower[nGram == bosGram, count := bosCounts]
-      mkn$counts[[x-1]]$data <- lower
-      saveObject(mkn$counts[[x-1]])
-    }
-     
     # Clear all NA values
     for (i in seq_along(current)) set(current, i=which(is.na(current[[i]])), j=i, value=0)
     

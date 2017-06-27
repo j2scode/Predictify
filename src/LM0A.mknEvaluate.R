@@ -25,26 +25,36 @@ mknEvaluate <- function(mkn, training, test, sents = NULL, directories) {
   
   
   # Function that performs the quadgram probability estimate 
-  score <- function(ngram, tokens, n) {
+  getScore <- function(ngram, n) {
     
-    Pmkn <- model[[n]][nGram == ngram][, Pmkn]
+    ngramType <- list('Quadgram', 'Trigram', 'Bigram', 'Unigram')
+    res <- list()
     
-    if (length(Pmkn) == 0) {
-      tokens <- tokens[2:length(tokens)]
-      ngram <- paste0(tokens, collapse = ' ')
-      return(score(ngram, tokens, n-1))
+    # Check if n-gram exists in training, and obtain probability
+    res$prob <- model[[n]][ nGram == ngram][, Pmkn]
+    res$type <- ngramType[[n]]
+    
+    if (length(res$prob) != 0) {
+      return(res)
+    } else if (n > 1) {
+      ngram <- paste0(unlist(strsplit(ngram, ' '))[-1], collapse = ' ')
+      return(getScore(ngram, n-1))
     } else {
-      return(log2(Pmkn))
+      res$prob <- model[[n]][ nGram == 'UNK'][, Pmkn]
+      return(res)
     }
   }
-  
+    
+   
   scoreSentence <- function(sentence) {
     tokens <- unlist(quanteda::tokenize(sentence, what = 'word'))
     rbindlist(lapply(seq_along(tokens[1:(length(tokens)-3)]), function(x) {
       ngram <- paste0(tokens[x:(x+3)], collapse = ' ')
+      score <- getScore(ngram, mkn$mOrder)
       sentScore <- list()
-      sentScore$quadgram <- paste0(tokens[x:(x+3)], collapse = ' ')
-      sentScore$logProb <- score(ngram, tokens[x:(x+3)], mkn$mOrder)
+      sentScore$quadgram <- ngram
+      sentScore$ngramType <- score$type
+      sentScore$logProb <- score$prob
       sentScore
     }))
   }
@@ -61,7 +71,9 @@ mknEvaluate <- function(mkn, training, test, sents = NULL, directories) {
   })
 
   message(paste('...loading test data'))
-  document <- readFile(test$processed[[mkn$mOrder]])
+  #filePath <- test$processed[[mkn$mOrder]]
+  filePath <- test
+  document <- readFile(filePath)
   if (!(is.null(sents))) {
     document <- sampleData(document, numChunks = sents, chunkSize = 1, format = 'v')
   }
@@ -132,4 +144,4 @@ mknEvaluate <- function(mkn, training, test, sents = NULL, directories) {
   return(evaluation)
 }
 ## ---- end
-#ppd <- mknEvaluate(lm$mkn$delta, corpora$training$delta,  corpora$validation$delta, sents = NULL, directories)
+#ppd <- mknEvaluate(lm$mkn$epsilon, corpora$training$epsilon,  corpora$validation$epsilon, sents = NULL, directories)
