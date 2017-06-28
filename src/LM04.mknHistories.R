@@ -24,17 +24,16 @@ mknHistories <- function(mkn, N) {
   })
 
   lapply(seq_along(model), function(x) {
-    if (x < N) {
+    if (x > 1) {
       message(paste('...counting number of histories for', 
                     mkn$counts[[x]]$fileDesc))
       
       current <- model[[x]]
-      higher  <- model[[x+1]]
 
       # Extract histories
-      histories1  <- higher[count == 1,.(context)]
-      histories2  <- higher[count == 2,.(context)]
-      histories3  <- higher[count > 2,.(context)]
+      histories1  <- current[count == 1,.(context)]
+      histories2  <- current[count == 2,.(context)]
+      histories3  <- current[count > 2,.(context)]
       
       # Count number of rows for each group
       counts1 <- histories1[,.(n1wdot = .N), by = context]
@@ -42,9 +41,9 @@ mknHistories <- function(mkn, N) {
       counts3 <- histories3[,.(n3pwdot = .N), by = context]
       
       # Merge counts into current ngram table
-      current <- merge(current, counts1, by.x = 'nGram', by.y = 'context', all.x = TRUE)
-      current <- merge(current, counts2, by.x = 'nGram', by.y = 'context', all.x = TRUE)
-      current <- merge(current, counts3, by.x = 'nGram', by.y = 'context', all.x = TRUE)
+      current <- merge(current, counts1, by.x = 'context', by.y = 'context', all.x = TRUE)
+      current <- merge(current, counts2, by.x = 'context', by.y = 'context', all.x = TRUE)
+      current <- merge(current, counts3, by.x = 'context', by.y = 'context', all.x = TRUE)
 
       # Clear all NA values
       for (i in seq_along(current)) set(current, i=which(is.na(current[[i]])), j=i, value=0)

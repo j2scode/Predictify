@@ -47,9 +47,12 @@ mknPipeline <- function(training, test, mkn, regex, directories) {
   
   # Compute weighting factor lambda
   parallelizeTask(mknLambda, mkn)
-
+  
   # Compute probabilities 
   parallelizeTask(mknEstimate, mkn)
+  
+  # Extract lm
+  extractMkn(mkn)
   
   # Publish language mkn
   parallelizeTask(mknPublish, mkn, directories)

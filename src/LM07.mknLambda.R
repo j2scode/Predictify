@@ -26,16 +26,16 @@ mknLambda <- function(mkn) {
 
   lapply(seq_along(model), function(x) {
     
-    if (x < mkn$mOrder) {
+    if (x > 1) {
       message(paste('...calculating scaling factor lambda for', 
                     mkn$counts[[x]]$fileDesc))
       #Obtain Model
       current <- model[[x]]
 
       # Extract discounts   
-      D1 <- discounts[x+1,4]$D1
-      D2 <- discounts[x+1,5]$D2
-      D3 <- discounts[x+1,6]$D3
+      D1 <- discounts[x,4]$D1
+      D2 <- discounts[x,5]$D2
+      D3 <- discounts[x,6]$D3
       
       # Calculate DnNn for context and add to lower level N-gram
       D <- current[,.(nGram, n1wdot, n2wdot, n3pwdot)]
@@ -47,10 +47,10 @@ mknLambda <- function(mkn) {
       current <- merge(current, D, by = 'nGram')
       
       # Compute lambda
-      if (x < mkn$mOrder-1) {
+      if (x < mkn$mOrder) {
         current <- current[, lambda := DnNn / summary[x+1,2]$Count]
       } else {
-        current <- current[, lambda := DnNn / count]
+        current <- current[, lambda := DnNn / contextCount]
       }
 
       # Save  counts

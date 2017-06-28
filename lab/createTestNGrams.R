@@ -32,11 +32,10 @@ createTestNGrams <- function(directories) {
     
       document <- readFile(korpus[[k]])
       nGrams[[k]]$data <- dfm(document, ngrams = k, remove_punct = FALSE, 
-                                   concatenator = ' ', tolower = FALSE)
+                                   concatenator = ' ', tolower = FALSE,
+                              what = 'fasterword')
       saveObject(nGrams[[k]])
   })
 
 }
 ## ---- end
-
-createTestNGrams(directories)

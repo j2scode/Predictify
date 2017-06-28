@@ -20,7 +20,7 @@ processCorpus <- function(korpus) {
   lapply(seq_along(korpus$processed), function(x) {
     message(paste('...creating', korpus$processed[[x]]$fileDesc, 'sentence boundaries'))
     annotatedDoc <- unlist(lapply(seq_along(document), function(s) {
-      paste(paste0(rep("BOS", times = x-1), collapse = " "), document[s], "EOS", collapse = " ")
+      paste(paste0(rep("<s>", times = x-1), collapse = " "), document[s], "</s>", collapse = " ")
     }))
     korpus$processed[[x]]$data <- annotatedDoc
     saveFile(korpus$processed[[x]])

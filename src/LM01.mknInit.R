@@ -27,11 +27,12 @@ mknInit <- function(mkn, nGrams, regex) {
     nGram <- loadObject(nGrams[[x]])
     counts <- data.table(nGram = featnames(nGram), key = 'nGram')
     
-    # Add n BOSs where n is the order of the nGram. 
-    bosGram <- paste0(rep("BOS", x), collapse = ' ')
-    counts <- rbindlist(list(counts, list(bosGram)))
-    
-    # Add Context if n > 1
+    # Add a start-of-sentence token to unigram to store unigram backoff weight
+    if (x == 1) {
+      counts <- rbindlist(list(counts, list("<s>")))
+    }
+
+    # Add Context and suffix if n > 1
     if (x > 1) {
       context <- gsub(regex$context[[x-1]], "\\1", counts$nGram, perl = TRUE)
       suffix  <- gsub(regex$suffix[[x-1]], "\\1", counts$nGram, perl = TRUE)

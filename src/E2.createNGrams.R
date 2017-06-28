@@ -26,7 +26,8 @@ createNGrams <- function(korpora, directories) {
                     korpora[[k]]$processed[[x]]$fileDesc))
       document <- readFile(korpora[[k]]$processed[[x]])
       korpora[[k]]$nGrams[[x]]$data <- dfm(document, ngrams = x, remove_punct = FALSE, 
-                                   concatenator = ' ', tolower = FALSE)
+                                   concatenator = ' ', tolower = FALSE,
+                                   what = 'fasterword')
       saveObject(korpora[[k]]$nGrams[[x]])
       s <- list()
       s$Corpus <- korpora[[k]]$corpusName

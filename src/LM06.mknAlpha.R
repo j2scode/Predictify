@@ -28,21 +28,15 @@ mknAlpha <- function(mkn) {
   lapply(seq_along(model), function(x) {
     message(paste('...calculating alpha probabilities for', 
                   mkn$counts[[x]]$fileDesc))
-    
-    # Load nGram Model n
-    current <- model[[x]]
-    
-    if (x == 1) {
-      
-      current <- current[, alpha := cKN / summary[2,2]$Count]
-      
-    } else {
+    if (x > 1) {
+      # Load nGram Model n
+      current <- model[[x]]
       
       # Select discounts for nGram Order
       dCounts <- t(subset(discounts, nGramOrder == x, select = c(-(1:2))))
       
-      # Compute count groups based upon raw counts
-      current[, group := min(3, (count)), by=count]
+      # Compute N1count groups based upon continution counts
+      current[, group := min(3, (cKN)), by=cKN]
       
       # Determine the discount based upon the count group
       current[, D := dCounts[group+1]]
@@ -55,25 +49,23 @@ mknAlpha <- function(mkn) {
       if (x < mkn$mOrder) {
         
         # Normalize alpha count with total continuation count
-        current[, alpha := alphaCount / summary[x,2]$Count]
+        current[, alpha := alphaCount / summary[x+1,2]$Count]
         
       } else {
         
         # Normalize by raw count of context
-        lower <- model[[x-1]][,.(nGram, count)]
-        setnames(lower, 'count', 'contextCount')
-        setkey(lower, nGram)
+        context <- current[,.(contextCount = sum(count)), by = context]
+        setkey(context, context)
         setkey(current, context)
-        current <- merge(current, lower, by.x = "context", by.y = "nGram")
+        current <- merge(current, context, by = "context")
         current[, alpha := alphaCount / contextCount]
-        
       }
+      # Save  counts
+      mkn$counts[[x]]$data <- current
+      saveObject(mkn$counts[[x]])
     }
-    # Save  counts
-    mkn$counts[[x]]$data <- current
-    saveObject(mkn$counts[[x]])
   })
-  
+
   
   # Log Results
   logR('mknAlpha', startTime, ' '  , ' ')

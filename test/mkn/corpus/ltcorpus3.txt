@@ -1,5 +1,15 @@
-BOS BOS this is a list containing the tallest buildings in san francisco EOS
-BOS BOS the transamerica pyramid is the tallest building in san francisco EOS
-BOS BOS 555 california street is the 2nd tallest building in san francisco EOS
-BOS BOS my favorite UNK is the mission EOS
-BOS BOS home UNK the warehouse party EOS
+<s> <s> this is a list containing the tallest buildings in san francisco </s>
+<s> <s> the transamerica pyramid is the tallest building in san francisco </s>
+<s> <s> 555 california street is the 2nd tallest building in san francisco </s>
+<s> <s> my favorite UNK is the mission </s>
+<s> <s> home UNK the warehouse party </s>
+<s> <s> rnb hip hop nu soul pop dance music forms of the modern club craze variety and the rest </s>
+<s> <s> for those who would embrace these words as evidence of a coming revolution one would advise caution </s>
+<s> <s> these remain questions put to the laity and we should trust that the issue remains one for discussion and not the outline of a pre determined plan whose features and priorities are already set out </s>
+<s> <s> for those who would dismiss this as next weeks fish wrap the remarkable boldness must surely make one think again </s>
+<s> <s> i did enjoy clicking through all the scenes to find various magical objects </s>
+<s> <s> it would be more rewarding though if we could unlock say a special chocolate frog card after wed collected all the others </s>
+<s> <s> it gives you a reason to find everything </s>
+<s> <s> i also wish we could look at what we've collected </s>
+<s> <s> i don't mean that j k </s>
+<s> <s> rowling has to write pages and pages of the magical books that we find </s>

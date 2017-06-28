@@ -1,1 +1,1 @@
-BOS BOS BOS the 3rd tallest building EOS
+<s> <s> <s> the UNK tallest building </s>
