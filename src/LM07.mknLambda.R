@@ -49,6 +49,7 @@ mknLambda <- function(mkn) {
       # Compute lambda
       if (x < mkn$mOrder) {
         current <- current[, lambda := DnNn / summary[x+1,2]$Count]
+        
       } else {
         current <- current[, lambda := DnNn / contextCount]
       }

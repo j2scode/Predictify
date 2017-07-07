@@ -48,16 +48,12 @@ mknAlpha <- function(mkn) {
       # Normalize alpha count 
       if (x < mkn$mOrder) {
         
-        # Normalize alpha count with total continuation count
+        # Normalize alpha count
         current[, alpha := alphaCount / summary[x+1,2]$Count]
         
       } else {
         
         # Normalize by raw count of context
-        context <- current[,.(contextCount = sum(count)), by = context]
-        setkey(context, context)
-        setkey(current, context)
-        current <- merge(current, context, by = "context")
         current[, alpha := alphaCount / contextCount]
       }
       # Save  counts

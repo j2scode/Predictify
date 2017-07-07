@@ -462,6 +462,10 @@ corpora = list(
       })
     ),
     epsilon = list(
+      corpusName = 'Training Set Epsilon',
+      directory = file.path(directories$testingDir, 'mkn'),
+      fileName = 'training-set-epsilon',
+      objName = 'trainingSetEpsilon',
       processed = lapply(seq(1:4), function(n) {
         nGram = list()
         nGram$directory <- file.path(directories$testingDir, 'mkn', 'corpus')
@@ -602,6 +606,7 @@ corpora = list(
       })
     ),
     epsilon = list(
+      corpusName = 'Validation Set Epsilon',
       directory = file.path(directories$testingDir, 'mkn', 'test'),
       fileName = 'test.txt',
       objName = 'test'
@@ -886,7 +891,7 @@ lm <- list(
   mkn = list(
     alpha = list(
       mName = 'MKNAlpha',
-      mDesc = 'MKN Model Alpha',
+      mDesc = 'MKN Quadgram Model Alpha',
       mOrder = 4,
       directory = file.path(directories$lm, 'mkn', 'alpha'),
       summary = list(
@@ -894,6 +899,13 @@ lm <- list(
         fileDesc = 'MKN N-Gram Count Summary',
         fileName = 'mkn-ngram-count-summary.Rdata',
         objName  = 'mknNGramCountSummary'
+      ),
+      training = list(
+        meta = corpora$training$alpha,
+        sents = 0,
+        tokens = 0,
+        types = 0,
+        size = ""
       ),
       discounts = list(
         directory = file.path(directories$lm, 'mkn', 'alpha'),
@@ -920,7 +932,7 @@ lm <- list(
     ),
     beta = list(
       mName = 'MKNBeta',
-      mDesc = 'MKN Model Beta',
+      mDesc = 'MKN Quadgram Model Beta',
       mOrder = 4,
       directory = file.path(directories$lm, 'mkn', 'beta'),
       summary = list(
@@ -928,6 +940,13 @@ lm <- list(
         fileDesc = 'MKN N-Gram Count Summary',
         fileName = 'mkn-ngram-count-summary.Rdata',
         objName  = 'mknNGramCountSummary'
+      ),
+      training = list(
+        meta = corpora$training$beta,
+        sents = 0,
+        tokens = 0,
+        types = 0,
+        size = ""
       ),
       discounts = list(
         directory = file.path(directories$lm, 'mkn', 'beta'),
@@ -954,7 +973,7 @@ lm <- list(
     ),
     gamma = list(
       mName = 'MKNGamma',
-      mDesc = 'MKN Model Gamma',
+      mDesc = 'MKN Quadgram Model Gamma',
       mOrder = 4,
       directory = file.path(directories$lm, 'mkn', 'gamma'),
       summary = list(
@@ -962,6 +981,13 @@ lm <- list(
         fileDesc = 'MKN N-Gram Count Summary',
         fileName = 'mkn-ngram-count-summary.Rdata',
         objName  = 'mknNGramCountSummary'
+      ),
+      training = list(
+        meta = corpora$training$gamma,
+        sents = 0,
+        tokens = 0,
+        types = 0,
+        size = ""
       ),
       discounts = list(
         directory = file.path(directories$lm, 'mkn', 'gamma'),
@@ -988,7 +1014,7 @@ lm <- list(
     ),
     delta = list(
       mName = 'MKNDelta',
-      mDesc = 'MKN Model Delta',
+      mDesc = 'MKN Quadgram Model Delta',
       mOrder = 4,
       directory = file.path(directories$lm, 'mkn', 'delta'),
       summary = list(
@@ -996,6 +1022,13 @@ lm <- list(
         fileDesc = 'MKN N-Gram Count Summary',
         fileName = 'mkn-ngram-count-summary.Rdata',
         objName  = 'mknNGramCountSummary'
+      ),
+      training = list(
+        meta = corpora$training$delta,
+        sents = 0,
+        tokens = 0,
+        types = 0,
+        size = ""
       ),
       discounts = list(
         directory = file.path(directories$lm, 'mkn', 'delta'),
@@ -1022,7 +1055,7 @@ lm <- list(
     ),
     epsilon = list(
       mName = 'MKNEpsilon',
-      mDesc = 'MKN Model Epsilon',
+      mDesc = 'MKN Quadgram Model Epsilon',
       mOrder = 4,
       directory = file.path(directories$lm, 'mkn', 'epsilon'),
       summary = list(
@@ -1030,6 +1063,13 @@ lm <- list(
         fileDesc = 'MKN N-Gram Count Summary',
         fileName = 'mkn-ngram-count-summary.Rdata',
         objName  = 'mknNGramCountSummary'
+      ),
+      training = list(
+        meta = corpora$training$epsilon,
+        sents = 0,
+        tokens = 0,
+        types = 0,
+        size = ""
       ),
       discounts = list(
         directory = file.path(directories$lm, 'mkn', 'epsilon'),

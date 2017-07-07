@@ -22,13 +22,11 @@ mknPipeline <- function(training, test, mkn, regex, directories) {
   message(paste('\nExecuting', mkn$mDesc, 'on',
                 training$corpusName, 'at', startTime))
   
-  gc()
-  
   # Get Test NGrams
-  createTestNGrams(directories)
+  #createTestNGrams(directories)
   
   # Initialize MKN language mkn
-  mknInit(mkn, training$nGrams, regex)
+  mkn <- mknInit(mkn, training, regex)
   
   # Create absolute counts of each nGram
   features <- parallelizeTask(mknAbsCount, mkn, training$nGrams)
@@ -52,13 +50,13 @@ mknPipeline <- function(training, test, mkn, regex, directories) {
   parallelizeTask(mknEstimate, mkn)
   
   # Extract lm
-  extractMkn(mkn)
+  #extractMkn(mkn)
   
   # Publish language mkn
   parallelizeTask(mknPublish, mkn, directories)
   
   # Evaluate Model
-  pp <- mknEvaluate(lm$mkn$epsilon, corpora$training$epsilon,  corpora$validation$epsilon, sents = NULL, directories)
+  pp <- mknEvaluate(mkn, test, sents = 1000, directories = directories)
   
   # Log Results
   logR('mknPipeline', startTime, '', '')

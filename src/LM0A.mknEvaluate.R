@@ -9,97 +9,188 @@
 #' perplexity scores. 
 #' 
 #' @param mkn - the meta data for the language model
-#' @param training the meta data for the training data 
 #' @param test - the meta data for the validation or test corpus
 #' @param sents - the number of sentences from the test data to evaluate, 
 #'                NULL = all sentences
+#' @param bos <- start of sentence symbol, defaults = <s>
+#' @param eos <- end of sentence symbol, default = </s>
+#' @param unk <- unknown word symbol, default 'UNK'
 #' @param directories - the project directory structure
 #' @return estimates - the probability estimates for each word in the test data
 #' @author John James
 #' @export
-mknEvaluate <- function(mkn, training, test, sents = NULL, directories) {
+mknEvaluate <- function(mkn, test, sents = NULL, bos = '<s>',
+                        eos = '</s>', unk = 'UNK', directories) {
   
   memory.limit(20000)
+ 
   startTime <- Sys.time()
   message(paste("\nEvaluating performance on ", mkn$mDesc, 'at', startTime))
+
+  # Reports progress 
+  rptProgress <- function(document, startTime, x) {
+    elapsed <- round(difftime(Sys.time(), startTime,  units = 'mins'))
+    elapsed <- as.numeric(elapsed) + 1
+    rate <- x / elapsed 
+    remaining <- length(document) - x
+    timeMin <- round(remaining / rate, digits = 1)
+    timeHrs <- round(timeMin / 60, digits = 1)
+    message(paste('......',x,'out of',length(document), 'sentences processed in', 
+                  elapsed, 'minutes.', timeMin,'minutes remaining (', timeHrs, 'hours)'))
+    
+  }
   
+  # Loads language model 
+  loadModel <- function(mkn) {  
+    message(paste('...loading language model'))
+    model <- lapply(seq_along(mkn$model), function(x) {
+      loadObject(mkn$model[[x]])
+    })
+    return(model)
+  }
   
-  # Function that performs the quadgram probability estimate 
-  getScore <- function(ngram, n) {
+  # Load summary counts
+  getSummaryCounts <- function(mkn) {
+    return(loadObject(mkn$summary))
+  }
+  
+  # Loads test data
+  loadTestData <- function(test, sents) {
+    message(paste('...loading test data'))
+    filePath <- test$processed[[4]]
+    document <- readFile(filePath)
+    if (!(is.null(sents))) {
+      document <- sampleData(document, numChunks = sents, chunkSize = 1, format = 'v')
+    }
+    dfm <- quanteda::dfm(document, what = 'fasterword', remove = '<s>', ngrams = 1)
     
-    ngramType <- list('Quadgram', 'Trigram', 'Bigram', 'Unigram')
-    res <- list()
-    
-    # Check if n-gram exists in training, and obtain probability
-    res$prob <- model[[n]][ nGram == ngram][, Pmkn]
-    res$type <- ngramType[[n]]
-    
-    if (length(res$prob) != 0) {
-      return(res)
-    } else if (n > 1) {
-      ngram <- paste0(unlist(strsplit(ngram, ' '))[-1], collapse = ' ')
-      return(getScore(ngram, n-1))
+    testData <- list(
+      document = document,
+      sents = length(document),
+      tokens = sum(ntoken(dfm)),
+      types = length(featnames(dfm)),
+      size = object.size(document)
+    )
+    return(testData)
+  }
+  
+  # Computes normalizing factor for alpha and lambda calculations
+  getNormalizer <- function(summary, ngram, order, n, model) {
+    if (n == order) {
+      normalizer <- model[[n]][ nGram == ngram][, contextCount]
     } else {
-      res$prob <- model[[n]][ nGram == 'UNK'][, Pmkn]
-      return(res)
+      normalizer <- summary[n+1,2]
     }
+    return(normalizer)
   }
+  
+  # Recursively computes probability of an ngram
+  getProb <- function(summary, ngram, order, n, model) {
     
-   
-  scoreSentence <- function(sentence) {
-    tokens <- unlist(quanteda::tokenize(sentence, what = 'word'))
-    rbindlist(lapply(seq_along(tokens[1:(length(tokens)-3)]), function(x) {
-      ngram <- paste0(tokens[x:(x+3)], collapse = ' ')
-      score <- getScore(ngram, mkn$mOrder)
-      sentScore <- list()
-      sentScore$quadgram <- ngram
-      sentScore$ngramType <- score$type
-      sentScore$logProb <- score$prob
-      sentScore
-    }))
-  }
-  
-  message('...loading training data')
-  train <- readFile(training$processed[[mkn$mOrder]])
-  df <- quanteda::dfm(train, tolower = FALSE, remove = 'BOS')
-  V <- length(featnames(df))
-  trainTokens <- sum(ntoken(df))
-
-  message(paste('...loading language model'))
-  model <- lapply(seq_along(mkn$model), function(x) {
-    loadObject(mkn$model[[x]])
-  })
-
-  message(paste('...loading test data'))
-  #filePath <- test$processed[[mkn$mOrder]]
-  filePath <- test
-  document <- readFile(filePath)
-  if (!(is.null(sents))) {
-    document <- sampleData(document, numChunks = sents, chunkSize = 1, format = 'v')
-  }
-  # Compute number of sentences and tokens w/o 'BOS'
-  M <- length(document) # M = number of sentences
-
-  message('...evaluating sentence probabilities')
-  scores <- rbindlist(lapply(seq_along(document), function(x) {
-    s <- scoreSentence(document[x])
-    if (x %in% c(100, 200, 500, 1000, 5000, 10000, 20000)) { 
-      elapsed <- round(difftime(Sys.time(), startTime,  units = 'mins'))
-      elapsed <- as.numeric(elapsed) + 1
-      rate <- x / elapsed 
-      remaining <- length(document) - x
-      timeMin <- round(remaining / rate, digits = 1)
-      timeHrs <- round(timeMin / 60, digits = 1)
-      message(paste('......',x,'out of',length(document), 'sentences processed in', 
-                    elapsed, 'minutes.', timeMin,'minutes remaining (', timeHrs, 'hours)'))
+    if (n == 1) {
+      return(model[[n]][ nGram == ngram][, Pmkn])
+    } else {
+      norm <- getNormalizer(summary, ngram, order, n, model)
+      alpha <- model[[n]][ nGram == ngram][, alphaCount] / norm
+      lambda <- model[[n]][ nGram == ngram][, DnNn] / norm
+      suffix <- paste0(unlist(strsplit(ngram, ' '))[-1], collapse = ' ')
+      return(alpha + lambda * getProb(summary, suffix, order, n-1, model))
     }
-    s
-  }))
+  }
   
+  # Estimates ngram probability
+  scoreNgram <- function(summary, ngram, lmOrder, order, model, nGramTypes) {
 
+    score <- list()
+    score$ngram <- ngram
+    score$type <- nGramTypes[[order]]
+    
+    # If highest order equals model order, return exact match probability
+    if (order == lmOrder) {
+      prob <- model[[order]][ nGram == ngram][, Pmkn]
+      score$prob <- prob
+      score$logProb <- log2(prob)
+
+    # Else compute probabilities recursively using getProb
+    } else {
+      suffix <- paste0(unlist(tail(strsplit(ngram, ' ')[[1]], order)), collapse = ' ')
+      prob <- as.numeric(getProb(summary, suffix, order, order, model))
+      score$prob <- prob
+      score$type <- nGramTypes[[order]]
+      score$logProb <- log2(prob)
+    }
+    return(score)
+  }
+  
+  # Determines ngram order based upon presence of ngram in training data
+  getNGramOrder <- function(ngram, mkn, n, model) {
+    prob <- model[[n]][ nGram == ngram][, Pmkn]
+    if (length(prob) != 0) {
+      return(n)
+    } else {
+      ngram <- paste0(unlist(strsplit(ngram, ' '))[-1], collapse = ' ')
+      return(getNGramOrder(ngram, mkn, n-1, model))
+    }
+  }
+  
+  # Estimates sentence probability
+  scoreSentence <- function(summary, sentence, mkn, model, nGramTypes) {
+    tokens <- unlist(quanteda::tokenize(sentence, what = 'fasterword'))
+    sentScore <- rbindlist(lapply(seq_along(tokens[1:(length(tokens)-3)]), function(x) {
+      ngram <- paste0(tokens[x:(x+3)], collapse = ' ')
+      order <- getNGramOrder(ngram, mkn, mkn$mOrder, model)
+      nGramScore <- scoreNgram(summary, ngram, mkn$mOrder, order, model, nGramTypes)
+      score <- list()
+      score$quadgram <- ngram
+      score$ngramType <- nGramScore$type
+      score$prob <- nGramScore$prob
+      score$logProb <- nGramScore$logProb
+      score
+    }))
+    return(sentScore)
+  }
+
+  # Estimates probabilities for corpus
+  scoreCorpus <- function(summary, document, mkn, model, nGramTypes) {
+    message('...evaluating sentence probabilities')
+    startTime <- Sys.time()
+    scores <- rbindlist(lapply(seq_along(document), function(x) {
+      s <- scoreSentence(summary, document[x], mkn, model, nGramTypes)
+      if (x %in% c(100, 200, 500, 1000, 5000, 10000, 20000)) { 
+        rptProgress(document, startTime, x)
+      }
+      s
+    }))
+    return(scores)
+  }
+  
+  # Summarize scoring statistics
+  getStats <- function(mkn, scores) {
+    counts <- loadObject(mkn$summary)
+    counts$Exact[1] <- sum(scores[,ngramType == 'Unigram'])
+    counts$Exact[2] <- sum(scores[,ngramType == 'Bigram'])
+    counts$Exact[3] <- sum(scores[,ngramType == 'Trigram'])
+    counts$Exact[4] <- sum(scores[,ngramType == 'Quadgram'])
+    counts <- counts[, Pct := Exact / sum(Exact) * 100]
+    return(counts)
+  }
+  
   # Compute perplexity
-  N <- length(scores$logProb)
-  pp <- 2^-(sum(scores$logProb) / N)
+  calcPerplexity <- function(scores) {
+    N <- length(scores$logProb)
+    H <- -1/N * sum(scores$logProb)
+    pp <- 2^H
+    return(pp)
+  }
+  
+  # Main processing
+  nGramTypes <- list('Unigram', 'Bigram', 'Trigram', 'Quadgram')
+  model <- loadModel(mkn)
+  testData <- loadTestData(test, sents)
+  summary <- getSummaryCounts(mkn)
+  scores <- scoreCorpus(summary, testData$document, mkn, model, nGramTypes)
+  stats <- getStats(mkn, scores)
+  pp <- calcPerplexity(scores)
   
   # Note the time
   endTime <- Sys.time()
@@ -111,16 +202,29 @@ mknEvaluate <- function(mkn, training, test, sents = NULL, directories) {
       date = startTime,
       end = endTime,
       duration = duration,
-      model = mkn$mDesc,
-      trainingSet = training$corpusName,
-      trainingSents = length(train),
-      trainingTokens = trainTokens,
-      trainingSize = object.size(train),
-      modelSize = object.size(model),
-      testSents = M,
-      testWords = N,
       perplexity = pp
     ),
+    model = list(
+      name = mkn$mName,
+      desc = mkn$mDesc,
+      stats = loadObject(mkn$summary),
+      size = object.size(model)
+    ),
+    training = list(
+      corpusName = mkn$training$meta$corpusName,
+      sents = mkn$training$sents,
+      tokens = mkn$training$tokens,
+      types = mkn$training$types,
+      size = mkn$training$size
+    ),
+    test = list(
+      corpusName = test$corpusName,
+      sents = testData$sents,
+      tokens = testData$tokens,
+      types = testData$types,
+      size = testData$size
+    ),
+    stats = stats,
     detail = scores
   )
   

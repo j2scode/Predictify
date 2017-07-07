@@ -37,6 +37,14 @@ mknAbsCount <- function(mkn, nGrams) {
     # Merge with counts table
     current <- merge(current, counts, by='nGram', all.x = TRUE)
     
+    # Add context counts for higher order ngrams
+    if (x > 1) {
+      context <- current[,.(contextCount = sum(count)), by = context]
+      setkey(context, context)
+      setkey(current, context)
+      current <- merge(current, context, by = "context")
+    }
+    
     # Clear all NA values
     for (i in seq_along(current)) set(current, i=which(is.na(current[[i]])), j=i, value=0)
     
