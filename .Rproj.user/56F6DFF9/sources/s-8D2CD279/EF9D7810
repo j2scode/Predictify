@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1499506434155.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "EF9D7810",
+    "lastKnownWriteTime" : 1499488073,
+    "last_content_update" : 1499488073,
+    "path" : "~/Data Science/Data Science Projects/PredictifyR-1.0/src/C5.buildCorpora.R",
+    "project_path" : "src/C5.buildCorpora.R",
+    "properties" : {
+        "cursorPosition" : "0,0",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

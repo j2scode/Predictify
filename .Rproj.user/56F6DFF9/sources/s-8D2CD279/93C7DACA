@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1499507945919.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "93C7DACA",
+    "lastKnownWriteTime" : 1494981719,
+    "last_content_update" : 1494981719,
+    "path" : "~/Data Science/Data Science Projects/PredictifyR-1.0/src/A1.reshapeData.R",
+    "project_path" : "src/A1.reshapeData.R",
+    "properties" : {
+        "cursorPosition" : "2,0",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
